@@ -1,16 +1,14 @@
-
 import { Heart } from 'lucide-react';
-
 const Footer = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
-  return (
-    <footer className="bg-gray-900 text-white py-12">
+  return <footer className="bg-gray-900 text-white py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo e Descrição */}
@@ -33,18 +31,12 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Links Úteis</h3>
             <ul className="space-y-2">
               <li>
-                <button 
-                  onClick={() => scrollToSection('how-it-works')}
-                  className="text-gray-400 hover:text-white transition-colors cursor-pointer text-left"
-                >
+                <button onClick={() => scrollToSection('how-it-works')} className="text-gray-400 hover:text-white transition-colors cursor-pointer text-left">
                   Como Funciona
                 </button>
               </li>
               <li>
-                <button 
-                  onClick={() => scrollToSection('pricing')}
-                  className="text-gray-400 hover:text-white transition-colors cursor-pointer text-left"
-                >
+                <button onClick={() => scrollToSection('pricing')} className="text-gray-400 hover:text-white transition-colors cursor-pointer text-left">
                   Preços
                 </button>
               </li>
@@ -59,17 +51,12 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Suporte</h3>
             <ul className="space-y-2">
               <li>
-                <button 
-                  onClick={() => scrollToSection('faq')}
-                  className="text-gray-400 hover:text-white transition-colors cursor-pointer text-left"
-                >
+                <button onClick={() => scrollToSection('faq')} className="text-gray-400 hover:text-white transition-colors cursor-pointer text-left">
                   Central de Ajuda
                 </button>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Contato
-                </a>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">Whatsapp</a>
               </li>
               <li>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -103,8 +90,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
