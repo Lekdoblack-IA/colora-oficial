@@ -32,7 +32,8 @@ const packages = [{
 const PricingSection = () => {
   const [selectedPackage, setSelectedPackage] = useState('plus');
   const selectedPkg = packages.find(pkg => pkg.id === selectedPackage);
-  return <section className="py-20 px-4 bg-gray-50">
+  return (
+    <section className="py-20 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -57,52 +58,66 @@ const PricingSection = () => {
             </div>
 
             {/* Conteúdo do card */}
-            <div className="p-8 text-center">
+            <div className="p-8 text-center flex flex-col items-center">
               {/* Nome do pacote */}
               <h2 className="font-bold text-gray-900 mb-3 text-3xl">
                 {selectedPkg?.name}
               </h2>
 
               {/* Descrição */}
-              <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+              <p className="text-gray-600 mb-6 text-sm leading-relaxed max-w-xs">
                 {selectedPkg?.description}
               </p>
 
               {/* Toggle de pacotes dentro do card */}
-              <div className="mb-6">
-                <ToggleGroup type="single" value={selectedPackage} onValueChange={value => value && setSelectedPackage(value)} className="inline-flex rounded-full bg-gray-100 p-1">
-                  {packages.map(pkg => <ToggleGroupItem key={pkg.id} value={pkg.id} className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-pink-500 data-[state=on]:to-red-500 data-[state=on]:text-white data-[state=on]:shadow-md text-gray-600 hover:text-gray-900">
+              <div className="mb-6 flex justify-center">
+                <ToggleGroup 
+                  type="single" 
+                  value={selectedPackage} 
+                  onValueChange={value => value && setSelectedPackage(value)} 
+                  className="inline-flex rounded-full bg-gray-100 p-1"
+                >
+                  {packages.map(pkg => (
+                    <ToggleGroupItem 
+                      key={pkg.id} 
+                      value={pkg.id} 
+                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-pink-500 data-[state=on]:to-red-500 data-[state=on]:text-white data-[state=on]:shadow-md text-gray-600 hover:text-gray-900"
+                    >
                       {pkg.name.split(' ')[1]}
-                    </ToggleGroupItem>)}
+                    </ToggleGroupItem>
+                  ))}
                 </ToggleGroup>
               </div>
 
-              {/* Preço */}
-              <div className="mb-2">
+              {/* Preço centralizado */}
+              <div className="mb-2 flex items-center justify-center">
                 <span className="text-pink-500 mr-1 font-bold text-2xl">R$</span>
                 <span className="font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent text-6xl">
                   {selectedPkg?.totalPrice}
                 </span>
               </div>
 
-              {/* Preço por crédito */}
+              {/* Preço por crédito centralizado */}
               <p className="text-pink-500 text-base font-medium mb-8 py-[15px]">
                 Apenas {selectedPkg?.pricePerCredit} Reais por imagem!
               </p>
 
-              {/* Botão CTA */}
+              {/* Botão CTA centralizado */}
               <Button className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white py-4 rounded-full text-base font-semibold mb-4 h-auto">
                 Transforme sua foto antes de Pagar
               </Button>
 
-              {/* Nota */}
-              {selectedPkg?.note && <p className={`text-sm ${selectedPkg.isPopular ? 'text-green-600 font-medium' : 'text-gray-500'}`}>
+              {/* Nota em verde */}
+              {selectedPkg?.note && (
+                <p className="text-sm text-green-600 font-medium">
                   {selectedPkg.note}
-                </p>}
+                </p>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
 export default PricingSection;
