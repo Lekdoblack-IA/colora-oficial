@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 
 export const useCenterAlignment = () => {
   const [isInCenter, setIsInCenter] = useState(false);
+  const [isInCenterWithDelay, setIsInCenterWithDelay] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const checkAlignment = () => {
@@ -18,6 +20,24 @@ export const useCenterAlignment = () => {
       const isAligned = Math.abs(elementCenter - screenCenter) <= tolerance;
       
       setIsInCenter(isAligned);
+      
+      if (isAligned) {
+        // Se está no centro, ativa imediatamente e cancela qualquer timeout pendente
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+        setIsInCenterWithDelay(true);
+      } else if (isInCenterWithDelay) {
+        // Se saiu do centro mas ainda está com delay ativo, inicia o timeout de 2 segundos
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+        timeoutRef.current = setTimeout(() => {
+          setIsInCenterWithDelay(false);
+          timeoutRef.current = null;
+        }, 2000);
+      }
     };
 
     const handleScroll = () => {
@@ -31,8 +51,11 @@ export const useCenterAlignment = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', checkAlignment);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
-  }, []);
+  }, [isInCenterWithDelay]);
 
-  return { ref, isInCenter };
+  return { ref, isInCenter: isInCenterWithDelay };
 };
