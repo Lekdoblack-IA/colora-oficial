@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { User, ChevronDown } from "lucide-react";
 import { AuthModal } from './AuthModal';
@@ -8,7 +9,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Simular estado de login
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,12 +22,18 @@ const Header = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    navigate('/');
     console.log('Logout realizado');
   };
 
   const handleLogin = () => {
     setIsLoggedIn(true);
     setIsAuthOpen(false);
+    navigate('/dashboard');
+  };
+
+  const handleDashboardClick = () => {
+    navigate('/dashboard');
   };
 
   return <>
@@ -34,7 +42,7 @@ const Header = () => {
         <div className="bg-white/80 backdrop-blur-md border-b border-white/20 px-4 py-[25px]">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             {/* Logo - Desktop */}
-            <div className="hidden md:flex items-center">
+            <div className="hidden md:flex items-center cursor-pointer" onClick={() => navigate('/')}>
               {isScrolled ? 
                 <img 
                   alt="Clr♡" 
@@ -50,7 +58,7 @@ const Header = () => {
             </div>
 
             {/* Logo - Mobile (centralizada) */}
-            <div className="md:hidden absolute left-1/2 transform -translate-x-1/2">
+            <div className="md:hidden absolute left-1/2 transform -translate-x-1/2 cursor-pointer" onClick={() => navigate('/')}>
               {isScrolled ? 
                 <img 
                   src="/lovable-uploads/0d4e9f12-e51b-41e2-b9cd-9910f8f3e9ee.png" 
@@ -84,11 +92,11 @@ const Header = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem>
-                      Perfil
+                    <DropdownMenuItem onClick={handleDashboardClick}>
+                      Dashboard
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      Dashboard
+                      Perfil
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout}>
                       Sair
