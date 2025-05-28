@@ -111,7 +111,7 @@ export const AuthModal = ({
                     </button>
                   </div>
                 </div>
-                <Button onClick={handleLogin} className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 hover:from-purple-700 hover:via-pink-700 hover:to-red-700 text-white rounded-2xl h-12 font-medium shadow-lg hover:shadow-xl transition-all duration-300">
+                <Button onClick={handleLogin} className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-500 hover:via-pink-700 hover:to-red-700 text-white rounded-2xl h-12 font-medium shadow-lg hover:shadow-xl transition-all duration-300">
                   Entrar
                 </Button>
               </div>
