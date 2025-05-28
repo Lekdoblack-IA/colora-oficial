@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/compone
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { X, Shield, Info } from 'lucide-react';
 
@@ -134,10 +135,18 @@ export const BuyCreditsModal = ({
               </p>
             </div>
             
-            {/* Credit info */}
+            {/* Credit info with tooltip */}
             <div className="flex items-center justify-center space-x-1 text-sm text-gray-500 mb-6">
-              <Info className="w-4 h-4" />
-              <span>Seus Créditos serão adicionados automaticamente após o pagamento.</span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="w-4 h-4 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Seus Créditos serão adicionados automaticamente após o pagamento.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
             
             {/* Savings note */}
