@@ -32,8 +32,7 @@ const packages = [{
 const PricingSection = () => {
   const [selectedPackage, setSelectedPackage] = useState('plus');
   const selectedPkg = packages.find(pkg => pkg.id === selectedPackage);
-  return (
-    <section className="py-20 px-4 bg-gray-50">
+  return <section className="py-20 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -71,21 +70,10 @@ const PricingSection = () => {
 
               {/* Toggle de pacotes dentro do card */}
               <div className="mb-6 flex justify-center">
-                <ToggleGroup 
-                  type="single" 
-                  value={selectedPackage} 
-                  onValueChange={value => value && setSelectedPackage(value)} 
-                  className="inline-flex rounded-full bg-gray-100 p-1"
-                >
-                  {packages.map(pkg => (
-                    <ToggleGroupItem 
-                      key={pkg.id} 
-                      value={pkg.id} 
-                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-pink-500 data-[state=on]:to-red-500 data-[state=on]:text-white data-[state=on]:shadow-md text-gray-600 hover:text-gray-900"
-                    >
+                <ToggleGroup type="single" value={selectedPackage} onValueChange={value => value && setSelectedPackage(value)} className="inline-flex rounded-full bg-gray-100 p-1">
+                  {packages.map(pkg => <ToggleGroupItem key={pkg.id} value={pkg.id} className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-pink-500 data-[state=on]:to-red-500 data-[state=on]:text-white data-[state=on]:shadow-md text-gray-600 hover:text-gray-900">
                       {pkg.name.split(' ')[1]}
-                    </ToggleGroupItem>
-                  ))}
+                    </ToggleGroupItem>)}
                 </ToggleGroup>
               </div>
 
@@ -103,21 +91,18 @@ const PricingSection = () => {
               </p>
 
               {/* Botão CTA centralizado */}
-              <Button className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white py-4 rounded-full text-base font-semibold mb-4 h-auto">
+              <Button className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-full font-semibold mb-4 h-auto text-base px-0 py-[17px]">
                 Transforme sua foto antes de Pagar
               </Button>
 
               {/* Nota em verde */}
-              {selectedPkg?.note && (
-                <p className="text-sm text-green-600 font-medium">
+              {selectedPkg?.note && <p className="text-sm text-green-600 font-medium">
                   {selectedPkg.note}
-                </p>
-              )}
+                </p>}
             </div>
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
 export default PricingSection;
