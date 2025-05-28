@@ -26,7 +26,39 @@ const ScratchCard = () => {
     // Criar uma imagem para a cobertura
     const img = new Image();
     img.onload = () => {
-      ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      // Calcular dimensões para manter proporção da imagem
+      const imgAspect = img.width / img.height;
+      const canvasAspect = rect.width / rect.height;
+      
+      let drawWidth, drawHeight, drawX, drawY;
+      
+      if (imgAspect > canvasAspect) {
+        // Imagem é mais larga - ajustar pela altura
+        drawHeight = rect.height;
+        drawWidth = drawHeight * imgAspect;
+        drawX = (rect.width - drawWidth) / 2;
+        drawY = 0;
+      } else {
+        // Imagem é mais alta - ajustar pela largura
+        drawWidth = rect.width;
+        drawHeight = drawWidth / imgAspect;
+        drawX = 0;
+        drawY = (rect.height - drawHeight) / 2;
+      }
+      
+      ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+      
+      // Adicionar overlay escuro nas bordas se necessário
+      if (drawX > 0) {
+        ctx.fillStyle = '#f3f4f6';
+        ctx.fillRect(0, 0, drawX, rect.height);
+        ctx.fillRect(drawX + drawWidth, 0, drawX, rect.height);
+      }
+      if (drawY > 0) {
+        ctx.fillStyle = '#f3f4f6';
+        ctx.fillRect(0, 0, rect.width, drawY);
+        ctx.fillRect(0, drawY + drawHeight, rect.width, drawY);
+      }
       
       // Adicionar texto sobre a imagem
       ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
@@ -107,9 +139,12 @@ const ScratchCard = () => {
         <div className="relative w-full h-full rounded-3xl overflow-hidden border border-gray-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:border-transparent hover:-translate-y-1">
           {/* Imagem de baixo - desenho para colorir */}
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-white"
+            className="absolute inset-0 bg-white bg-cover bg-center"
             style={{
-              backgroundImage: "url('/lovable-uploads/281ee0c9-3370-4346-a604-231d215ef59f.png')"
+              backgroundImage: "url('/lovable-uploads/281ee0c9-3370-4346-a604-231d215ef59f.png')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
             }}
           />
           
