@@ -30,7 +30,7 @@ const Header = () => {
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             {/* Logo - Desktop */}
             <div className="hidden md:flex items-center">
-              {isScrolled ? <img src="/lovable-uploads/4b9d0e21-429d-4ec8-a995-7dc39afd21d8.png" alt="Clr♡" className="h-8 transition-all duration-300" /> : <img src="/lovable-uploads/a87e684d-fed7-4b3a-88ff-3c24e99d5962.png" alt="Colora♡" className="h-10 transition-all duration-300" />}
+              {isScrolled ? <img alt="Clr♡" className="h-8 transition-all duration-300" src="/lovable-uploads/6079cd78-695d-41a4-a3ce-197dfdce875a.png" /> : <img src="/lovable-uploads/a87e684d-fed7-4b3a-88ff-3c24e99d5962.png" alt="Colora♡" className="h-10 transition-all duration-300" />}
             </div>
 
             {/* Logo - Mobile (centralizada) */}
