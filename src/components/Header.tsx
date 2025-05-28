@@ -2,14 +2,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { User, ChevronDown } from "lucide-react";
+import { User, ChevronDown, LogOut, CreditCard } from "lucide-react";
 import { AuthModal } from './AuthModal';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // Simulando usuário logado no dashboard
+  const [userEmail] = useState("usuario@exemplo.com"); // Mock do email do usuário
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,8 +33,13 @@ const Header = () => {
     navigate('/dashboard');
   };
 
-  const handleDashboardClick = () => {
-    navigate('/dashboard');
+  const handleBuyCredits = () => {
+    // Esta função será conectada ao modal de comprar créditos
+    console.log('Abrir modal de comprar créditos');
+  };
+
+  const handleInicio = () => {
+    navigate('/');
   };
 
   return <>
@@ -41,8 +47,8 @@ const Header = () => {
         {/* Header principal com glassmorphism */}
         <div className="bg-white/80 backdrop-blur-md border-b border-white/20 px-4 py-[25px]">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            {/* Logo - Desktop */}
-            <div className="hidden md:flex items-center cursor-pointer" onClick={() => navigate('/')}>
+            {/* Logo - Desktop e Mobile */}
+            <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
               {isScrolled ? 
                 <img 
                   alt="Clr♡" 
@@ -52,62 +58,68 @@ const Header = () => {
                 <img 
                   src="/lovable-uploads/ee0393c6-5834-4e27-b4e2-7731aac513e6.png" 
                   alt="Colora♡" 
-                  className="h-10 transition-all duration-300" 
+                  className="h-10 md:h-10 transition-all duration-300" 
                 />
               }
             </div>
 
-            {/* Logo - Mobile (centralizada) */}
-            <div className="md:hidden absolute left-1/2 transform -translate-x-1/2 cursor-pointer" onClick={() => navigate('/')}>
-              {isScrolled ? 
-                <img 
-                  src="/lovable-uploads/0d4e9f12-e51b-41e2-b9cd-9910f8f3e9ee.png" 
-                  alt="Clr♡" 
-                  className="h-6 transition-all duration-300" 
-                /> : 
-                <img 
-                  src="/lovable-uploads/ee0393c6-5834-4e27-b4e2-7731aac513e6.png" 
-                  alt="Colora♡" 
-                  className="h-8 transition-all duration-300" 
-                />
-              }
-            </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:block">
-              {!isLoggedIn ? 
+            {/* Navigation - Desktop e Mobile */}
+            <div className="flex items-center space-x-4">
+              {!isLoggedIn ? (
                 <Button 
                   onClick={() => setIsAuthOpen(true)} 
                   variant="outline" 
                   className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200"
                 >
                   Entrar
-                </Button> : 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 flex items-center space-x-2">
-                      <User className="h-4 w-4" />
-                      <span>Minha Conta</span>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={handleDashboardClick}>
-                      Dashboard
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      Perfil
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleLogout}>
-                      Sair
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              }
+                </Button>
+              ) : (
+                <>
+                  {/* Botão Início */}
+                  <Button 
+                    onClick={handleInicio}
+                    variant="ghost" 
+                    className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hidden md:flex"
+                  >
+                    Início
+                  </Button>
+                  
+                  {/* Dropdown Minha Conta */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 flex items-center space-x-2">
+                        <User className="h-4 w-4" />
+                        <span className="hidden md:inline">Minha Conta</span>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg">
+                      <DropdownMenuLabel className="font-normal">
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium leading-none">Minha Conta</p>
+                          <p className="text-xs leading-none text-muted-foreground">
+                            {userEmail}
+                          </p>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleInicio} className="md:hidden">
+                        Início
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleBuyCredits}>
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        Comprar Créditos
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Sair
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              )}
             </div>
-
-            {/* Mobile - Espaço vazio para balancear o layout */}
-            <div className="md:hidden w-8" />
           </div>
         </div>
         
