@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { galleryImages } from '@/data/galleryImages';
 import { useCarouselAutoplay } from '@/hooks/useCarouselAutoplay';
+import { useTouchDrag } from '@/hooks/useTouchDrag';
 import GalleryImage from './GalleryImage';
 import GalleryControls from './GalleryControls';
 import GalleryIndicators from './GalleryIndicators';
@@ -35,6 +36,12 @@ const GalleryCarousel = () => {
     return normalizedDiff;
   };
 
+  const { touchHandlers, mouseHandlers } = useTouchDrag({
+    onSwipeLeft: nextSlide,
+    onSwipeRight: prevSlide,
+    threshold: 50,
+  });
+
   useCarouselAutoplay({
     isAutoPlaying,
     currentIndex,
@@ -66,8 +73,13 @@ const GalleryCarousel = () => {
         })}
       </div>
 
-      {/* Mobile: Simplified Carousel */}
-      <div className="md:hidden relative w-full h-full flex items-center justify-center">
+      {/* Mobile: Touch-enabled Carousel */}
+      <div 
+        className="md:hidden relative w-full h-full flex items-center justify-center touch-pan-y"
+        {...touchHandlers}
+        {...mouseHandlers}
+        style={{ userSelect: 'none' }}
+      >
         {galleryImages.map((image, index) => {
           const isActive = index === currentIndex;
           const isPrev = index === (currentIndex - 1 + galleryImages.length) % galleryImages.length;
@@ -90,7 +102,11 @@ const GalleryCarousel = () => {
         })}
       </div>
 
-      <GalleryControls onPrevious={prevSlide} onNext={nextSlide} />
+      {/* Controls - apenas no desktop */}
+      <div className="hidden md:block">
+        <GalleryControls onPrevious={prevSlide} onNext={nextSlide} />
+      </div>
+      
       <GalleryIndicators 
         totalImages={galleryImages.length}
         currentIndex={currentIndex}
