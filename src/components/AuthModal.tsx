@@ -9,31 +9,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onLogin?: () => void;
 }
 
-export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
+export const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleGoogleLogin = () => {
-    // Implementar login com Google
     console.log('Login com Google');
+    onLogin?.();
+    onClose();
   };
 
   const handleLogin = () => {
-    // Implementar login
     console.log('Login:', { email, password });
+    onLogin?.();
+    onClose();
   };
 
   const handleSignup = () => {
-    // Implementar cadastro
     console.log('Cadastro:', { name, email, password, confirmPassword });
+    onLogin?.();
+    onClose();
   };
 
   const handleResetPassword = () => {
-    // Implementar recuperação de senha
     console.log('Recuperar senha:', { email });
   };
 
