@@ -3,7 +3,6 @@ import { Lock, Download, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { useToast } from '@/hooks/use-toast';
-
 interface UserImage {
   id: string;
   originalUrl: string;
@@ -101,12 +100,12 @@ export const UserImagesGallery = ({
         const isLocked = !image.isUnlocked && !expired;
         return <div key={image.id} className="relative group">
               <div className="relative overflow-hidden rounded-lg shadow-md">
-                <AspectRatio ratio={4/5}>
+                <AspectRatio ratio={4 / 5}>
                   <img src={image.transformedUrl} alt="Desenho transformado" className={`w-full h-full object-cover transition-all duration-300 ${isLocked ? 'filter blur-[2px]' : ''}`} />
                   
                   {/* Overlay para imagens bloqueadas */}
                   {isLocked && <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-                      <div className="text-center text-white">
+                      <div className="text-center text-white rounded-xl px-[12px] py-[14px] bg-black/[0.38]">
                         <Lock className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2" />
                         <p className="font-medium text-sm md:text-base">Bloqueada</p>
                         <p className="text-xs md:text-sm opacity-90">Use créditos para liberar</p>
