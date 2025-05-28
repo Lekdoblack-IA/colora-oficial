@@ -11,6 +11,7 @@ interface LoginForm {
 interface RegisterForm {
   name: string;
   email: string;
+  phone: string;
   password: string;
   confirmPassword: string;
 }
@@ -27,6 +28,13 @@ export const useAuthForm = () => {
 
   const validatePassword = (password: string): boolean => {
     return password.length >= 6;
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    // Remove todos os caracteres não numéricos
+    const numbers = phone.replace(/\D/g, '');
+    // Verifica se tem 11 dígitos (padrão brasileiro com celular)
+    return numbers.length === 11;
   };
 
   const handleLogin = async (formData: LoginForm): Promise<boolean> => {
@@ -82,7 +90,7 @@ export const useAuthForm = () => {
     if (!formData.name.trim()) {
       toast({
         title: "Nome obrigatório",
-        description: "Por favor, insira seu nome.",
+        description: "Por favor, insira seu nome completo.",
         variant: "destructive"
       });
       return false;
@@ -92,6 +100,15 @@ export const useAuthForm = () => {
       toast({
         title: "Email inválido",
         description: "Por favor, insira um email válido.",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    if (!validatePhone(formData.phone)) {
+      toast({
+        title: "Telefone inválido",
+        description: "Por favor, insira um telefone válido no formato (11) 9 9999-9999.",
         variant: "destructive"
       });
       return false;
@@ -117,7 +134,12 @@ export const useAuthForm = () => {
 
     setIsSubmitting(true);
     try {
-      await register(formData.name, formData.email, formData.password);
+      // Remove formatação do telefone antes de enviar
+      const cleanPhone = formData.phone.replace(/\D/g, '');
+      
+      await register(formData.name, formData.email, formData.password, {
+        phone: cleanPhone
+      });
       toast({
         title: "Conta criada com sucesso!",
         description: "Bem-vindo ao Colora! Você ganhou 1 crédito gratuito.",

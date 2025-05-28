@@ -24,6 +24,7 @@ export type Database = {
           locale: string | null
           login_count: number | null
           name: string
+          phone: string | null
           updated_at: string
           verified_email: boolean | null
         }
@@ -41,6 +42,7 @@ export type Database = {
           locale?: string | null
           login_count?: number | null
           name: string
+          phone?: string | null
           updated_at?: string
           verified_email?: boolean | null
         }
@@ -58,6 +60,7 @@ export type Database = {
           locale?: string | null
           login_count?: number | null
           name?: string
+          phone?: string | null
           updated_at?: string
           verified_email?: boolean | null
         }

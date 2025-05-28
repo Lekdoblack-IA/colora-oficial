@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Heart, Mail, Lock, User, Eye, EyeOff, Loader2, Phone } from 'lucide-react';
 import { useAuthForm } from '@/hooks/useAuthForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -18,6 +18,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -26,10 +27,32 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const { resetPassword, signInWithGoogle } = useAuth();
   const { toast } = useToast();
 
+  const formatPhone = (value: string) => {
+    // Remove todos os caracteres não numéricos
+    const numbers = value.replace(/\D/g, '');
+    
+    // Aplica a máscara (11) 9 9999-9999
+    if (numbers.length <= 2) {
+      return `(${numbers}`;
+    } else if (numbers.length <= 3) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    } else if (numbers.length <= 7) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 3)} ${numbers.slice(3)}`;
+    } else {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 3)} ${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+    }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhone(e.target.value);
+    setPhone(formatted);
+  };
+
   const resetForm = () => {
     setEmail('');
     setPassword('');
     setName('');
+    setPhone('');
     setConfirmPassword('');
     setShowPassword(false);
     setShowConfirmPassword(false);
@@ -44,7 +67,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   };
 
   const onRegisterSubmit = async () => {
-    const success = await handleRegister({ name, email, password, confirmPassword });
+    const success = await handleRegister({ name, email, phone, password, confirmPassword });
     if (success) {
       resetForm();
       onClose();
@@ -197,7 +220,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             <TabsContent value="signup" className="space-y-4 mt-6">
               <div className="space-y-4">
                 <div className="relative">
-                  <Label htmlFor="name" className="text-gray-700 font-medium">Nome</Label>
+                  <Label htmlFor="name" className="text-gray-700 font-medium">Nome Completo</Label>
                   <div className="relative mt-1">
                     <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                     <Input 
@@ -221,6 +244,22 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       onChange={e => setEmail(e.target.value)} 
                       placeholder="seu@email.com" 
                       disabled={isSubmitting}
+                      className="pl-10 h-12 rounded-2xl border-gray-200 focus:border-pink-500 focus:ring-pink-500" 
+                    />
+                  </div>
+                </div>
+                <div className="relative">
+                  <Label htmlFor="phone" className="text-gray-700 font-medium">Telefone</Label>
+                  <div className="relative mt-1">
+                    <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <Input 
+                      id="phone" 
+                      type="tel" 
+                      value={phone} 
+                      onChange={handlePhoneChange} 
+                      placeholder="(11) 9 9999-9999" 
+                      disabled={isSubmitting}
+                      maxLength={16}
                       className="pl-10 h-12 rounded-2xl border-gray-200 focus:border-pink-500 focus:ring-pink-500" 
                     />
                   </div>
