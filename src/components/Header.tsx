@@ -90,6 +90,7 @@ const Header = ({
                 onBuyCredits={handleBuyCredits}
                 onGoHome={handleGoHome}
                 onGoDashboard={handleGoDashboard}
+                userCredits={user?.credits || 0}
               />
             </div>
           </div>

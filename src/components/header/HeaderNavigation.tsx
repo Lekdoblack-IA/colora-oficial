@@ -11,6 +11,7 @@ interface HeaderNavigationProps {
   onBuyCredits: () => void;
   onGoHome: () => void;
   onGoDashboard: () => void;
+  userCredits: number;
 }
 
 export const HeaderNavigation = ({
@@ -21,7 +22,8 @@ export const HeaderNavigation = ({
   onLogout,
   onBuyCredits,
   onGoHome,
-  onGoDashboard
+  onGoDashboard,
+  userCredits
 }: HeaderNavigationProps) => {
   if (!isLoggedIn) {
     return (
@@ -37,12 +39,8 @@ export const HeaderNavigation = ({
 
   return (
     <UserDropdown
-      isDashboard={isDashboard}
-      userEmail={userEmail}
       onLogout={onLogout}
-      onBuyCredits={onBuyCredits}
-      onGoHome={onGoHome}
-      onGoDashboard={onGoDashboard}
+      userCredits={userCredits}
     />
   );
 };
