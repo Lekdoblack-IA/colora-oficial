@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuthForm } from '@/hooks/useAuthForm';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -22,6 +24,8 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const { handleLogin, handleRegister, isSubmitting } = useAuthForm();
+  const { resetPassword, signInWithGoogle } = useAuth();
+  const { toast } = useToast();
 
   const resetForm = () => {
     setEmail('');
@@ -48,14 +52,41 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     }
   };
 
-  const handleResetPassword = () => {
-    console.log('Recuperar senha:', { email });
-    // TODO: Implementar quando integrar com Supabase
+  const handleResetPassword = async () => {
+    if (!email) {
+      toast({
+        title: "Email obrigatório",
+        description: "Por favor, insira seu email para recuperar a senha.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await resetPassword(email);
+      toast({
+        title: "Email enviado!",
+        description: "Verifique sua caixa de entrada para redefinir sua senha.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao enviar email",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleGoogleLogin = () => {
-    console.log('Login com Google');
-    // TODO: Implementar quando integrar com Supabase
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error: any) {
+      toast({
+        title: "Erro no login com Google",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
 
   return (

@@ -1,7 +1,9 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
-interface User {
+interface UserProfile {
   id: string;
   email: string;
   name: string;
@@ -9,12 +11,15 @@ interface User {
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: UserProfile | null;
+  session: Session | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateCredits: (credits: number) => void;
+  resetPassword: (email: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,64 +37,86 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Carregar usuário do localStorage ao inicializar
-  useEffect(() => {
-    const savedUser = localStorage.getItem('auth_user');
-    if (savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
-      } catch (error) {
-        console.error('Erro ao carregar usuário do localStorage:', error);
-        localStorage.removeItem('auth_user');
-      }
-    }
-    setIsLoading(false);
-  }, []);
+  // Buscar perfil do usuário na tabela profiles
+  const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-  // Salvar usuário no localStorage quando mudar
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('auth_user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('auth_user');
+      if (error) {
+        console.error('Erro ao buscar perfil:', error);
+        return null;
+      }
+
+      return {
+        id: data.id,
+        email: session?.user?.email || '',
+        name: data.name,
+        credits: data.credits
+      };
+    } catch (error) {
+      console.error('Erro ao buscar perfil:', error);
+      return null;
     }
-  }, [user]);
+  };
+
+  // Configurar listeners de autenticação
+  useEffect(() => {
+    // Configurar listener de mudanças de autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session);
+        setSession(session);
+        
+        if (session?.user) {
+          // Buscar perfil do usuário
+          const userProfile = await fetchUserProfile(session.user.id);
+          setUser(userProfile);
+        } else {
+          setUser(null);
+        }
+        
+        setIsLoading(false);
+      }
+    );
+
+    // Verificar sessão inicial
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setSession(session);
+        fetchUserProfile(session.user.id).then(setUser);
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Simular API call - remover quando integrar com Supabase
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Verificar se é um usuário existente no localStorage
-      const existingUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
-      const existingUser = existingUsers.find((u: any) => u.email === email);
-      
-      if (existingUser) {
-        // Usuário existente - usar créditos salvos
-        const userData: User = {
-          id: existingUser.id,
-          email,
-          name: existingUser.name,
-          credits: existingUser.credits
-        };
-        setUser(userData);
-      } else {
-        // Simular resposta da API para usuário não cadastrado localmente
-        const userData: User = {
-          id: Date.now().toString(),
-          email,
-          name: email.split('@')[0],
-          credits: 0 // Usuários fazendo login não ganham créditos iniciais
-        };
-        setUser(userData);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data.user) {
+        const userProfile = await fetchUserProfile(data.user.id);
+        setUser(userProfile);
       }
     } catch (error) {
-      throw new Error('Erro ao fazer login. Verifique suas credenciais.');
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -98,62 +125,100 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const register = async (name: string, email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Simular API call - remover quando integrar com Supabase
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Criar novo usuário com 1 crédito inicial
-      const userData: User = {
-        id: Date.now().toString(),
+      const { data, error } = await supabase.auth.signUp({
         email,
-        name,
-        credits: 1 // NOVO USUÁRIO GANHA 1 CRÉDITO GRATUITO
-      };
+        password,
+        options: {
+          data: {
+            name: name
+          }
+        }
+      });
 
-      // Salvar na lista de usuários registrados para controle local
-      const existingUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
-      const newUserRecord = {
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        credits: userData.credits
-      };
-      existingUsers.push(newUserRecord);
-      localStorage.setItem('registered_users', JSON.stringify(existingUsers));
+      if (error) {
+        throw new Error(error.message);
+      }
 
-      setUser(userData);
+      // Se o usuário foi criado com sucesso, buscar o perfil
+      if (data.user) {
+        // Aguardar um pouco para o trigger criar o perfil
+        setTimeout(async () => {
+          const userProfile = await fetchUserProfile(data.user!.id);
+          setUser(userProfile);
+        }, 1000);
+      }
     } catch (error) {
-      throw new Error('Erro ao criar conta. Tente novamente.');
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      setSession(null);
+    } catch (error) {
+      console.error('Erro no logout:', error);
+    }
   };
 
-  const updateCredits = (credits: number) => {
-    if (user) {
-      const updatedUser = { ...user, credits };
-      setUser(updatedUser);
-      
-      // Atualizar também na lista de usuários registrados
-      const existingUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
-      const updatedUsers = existingUsers.map((u: any) => 
-        u.email === user.email ? { ...u, credits } : u
-      );
-      localStorage.setItem('registered_users', JSON.stringify(updatedUsers));
+  const updateCredits = async (credits: number) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ credits })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Erro ao atualizar créditos:', error);
+        return;
+      }
+
+      // Atualizar estado local
+      setUser({ ...user, credits });
+    } catch (error) {
+      console.error('Erro ao atualizar créditos:', error);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`
+      }
+    });
+
+    if (error) {
+      throw new Error(error.message);
     }
   };
 
   return (
     <AuthContext.Provider value={{
       user,
+      session,
       isLoading,
       login,
       register,
       logout,
-      updateCredits
+      updateCredits,
+      resetPassword,
+      signInWithGoogle
     }}>
       {children}
     </AuthContext.Provider>
