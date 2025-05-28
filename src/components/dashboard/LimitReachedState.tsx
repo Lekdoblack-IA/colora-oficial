@@ -1,12 +1,10 @@
-
 export const LimitReachedState = () => {
-  return (
-    <section className="bg-white rounded-2xl p-8 shadow-sm">
+  return <section className="bg-white rounded-2xl p-8 shadow-sm">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
           Transformar Nova Imagem
         </h2>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <div className="border border-red-200 rounded-lg p-6 bg-[#ffecec]">
           <p className="text-yellow-800 font-medium">
             Limite de imagens atingido
           </p>
@@ -16,6 +14,5 @@ export const LimitReachedState = () => {
           </p>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
