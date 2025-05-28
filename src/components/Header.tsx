@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AuthModal } from './AuthModal';
 import { BuyCreditsModal } from './dashboard/BuyCreditsModal';
 import { HeaderLogo } from './header/HeaderLogo';
 import { HeaderNavigation } from './header/HeaderNavigation';
@@ -13,6 +12,7 @@ interface HeaderProps {
   isLoggedIn?: boolean;
   onLogin?: () => void;
   onLogout?: () => void;
+  onAuthModalOpen?: () => void;
 }
 
 const Header = ({ 
@@ -20,10 +20,10 @@ const Header = ({
   onCreditsAdded, 
   isLoggedIn = false,
   onLogin,
-  onLogout
+  onLogout,
+  onAuthModalOpen
 }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isBuyCreditsOpen, setIsBuyCreditsOpen] = useState(false);
   const [userEmail] = useState("usuario@exemplo.com");
   const navigate = useNavigate();
@@ -49,15 +49,10 @@ const Header = ({
     console.log('Logout realizado');
   };
 
-  const handleLogin = () => {
-    setIsAuthOpen(false);
-    if (onLogin) {
-      onLogin();
-    }
-  };
-
   const handleOpenAuthModal = () => {
-    setIsAuthOpen(true);
+    if (onAuthModalOpen) {
+      onAuthModalOpen();
+    }
   };
 
   const handleBuyCredits = () => {
@@ -108,12 +103,6 @@ const Header = ({
         <HeaderBanner isDashboard={isDashboard} isScrolled={isScrolled} />
       </header>
 
-      <AuthModal 
-        isOpen={isAuthOpen} 
-        onClose={() => setIsAuthOpen(false)} 
-        onLogin={handleLogin} 
-      />
-      
       <BuyCreditsModal 
         isOpen={isBuyCreditsOpen}
         onClose={() => setIsBuyCreditsOpen(false)}

@@ -30,6 +30,8 @@ export const useScratchCard = ({ isLoggedIn, onAuthModalOpen }: UseScratchCardPr
       console.log('User not logged in, opening auth modal');
       if (onAuthModalOpen) {
         onAuthModalOpen();
+      } else {
+        console.error('onAuthModalOpen function not provided');
       }
     }
   }, [isLoggedIn, navigate, onAuthModalOpen]);
