@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { BuyCreditsModal } from './dashboard/BuyCreditsModal';
 import { HeaderLogo } from './header/HeaderLogo';
 import { HeaderNavigation } from './header/HeaderNavigation';
@@ -10,22 +11,17 @@ interface HeaderProps {
   userCredits?: number;
   onCreditsAdded?: (credits: number) => void;
   isLoggedIn?: boolean;
-  onLogin?: () => void;
   onLogout?: () => void;
   onAuthModalOpen?: () => void;
 }
 
 const Header = ({ 
-  userCredits = 5, 
   onCreditsAdded, 
-  isLoggedIn = false,
-  onLogin,
-  onLogout,
   onAuthModalOpen
 }: HeaderProps) => {
+  const { user, logout, updateCredits } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isBuyCreditsOpen, setIsBuyCreditsOpen] = useState(false);
-  const [userEmail] = useState("usuario@exemplo.com");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -40,9 +36,7 @@ const Header = ({
   }, []);
 
   const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    }
+    logout();
     if (isDashboard) {
       navigate('/');
     }
@@ -61,6 +55,7 @@ const Header = ({
 
   const handleCreditsAdded = (credits: number) => {
     setIsBuyCreditsOpen(false);
+    updateCredits((user?.credits || 0) + credits);
     if (onCreditsAdded) {
       onCreditsAdded(credits);
     }
@@ -81,15 +76,15 @@ const Header = ({
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <HeaderLogo 
               isDashboard={isDashboard} 
-              isLoggedIn={isLoggedIn} 
-              userCredits={userCredits} 
+              isLoggedIn={!!user} 
+              userCredits={user?.credits || 0} 
             />
 
             <div className="flex items-center space-x-4">
               <HeaderNavigation
-                isLoggedIn={isLoggedIn}
+                isLoggedIn={!!user}
                 isDashboard={isDashboard}
-                userEmail={userEmail}
+                userEmail={user?.email || ""}
                 onOpenAuthModal={handleOpenAuthModal}
                 onLogout={handleLogout}
                 onBuyCredits={handleBuyCredits}
@@ -107,7 +102,7 @@ const Header = ({
         isOpen={isBuyCreditsOpen}
         onClose={() => setIsBuyCreditsOpen(false)}
         onCreditsAdded={handleCreditsAdded}
-        currentCredits={userCredits}
+        currentCredits={user?.credits || 0}
       />
     </>
   );

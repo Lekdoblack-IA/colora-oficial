@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { DashboardHowItWorks } from '@/components/dashboard/DashboardHowItWorks';
@@ -18,28 +19,12 @@ interface UserImage {
 }
 
 const Dashboard = () => {
-  const [userCredits, setUserCredits] = useState(5);
+  const { user, logout, updateCredits } = useAuth();
   const [userImages, setUserImages] = useState<UserImage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showBuyCreditsModal, setShowBuyCreditsModal] = useState(false);
   const [selectedImageToUnlock, setSelectedImageToUnlock] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const navigate = useNavigate();
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate('/');
-    }
-  }, [isLoggedIn, navigate]);
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-  };
 
   const handleImageTransformed = (originalUrl: string, transformedUrl: string) => {
     const newImage: UserImage = {
@@ -60,13 +45,13 @@ const Dashboard = () => {
   };
 
   const handleUnlockImage = (imageId: string) => {
-    if (userCredits < 1) {
+    if (!user || user.credits < 1) {
       setSelectedImageToUnlock(imageId);
       setShowBuyCreditsModal(true);
       return;
     }
 
-    setUserCredits(prev => prev - 1);
+    updateCredits(user.credits - 1);
     setUserImages(prev => 
       prev.map(img => 
         img.id === imageId 
@@ -82,11 +67,13 @@ const Dashboard = () => {
   };
 
   const handleCreditsAdded = (credits: number) => {
-    setUserCredits(prev => prev + credits);
+    if (user) {
+      updateCredits(user.credits + credits);
+    }
     setShowBuyCreditsModal(false);
     
     // Se havia uma imagem selecionada para desbloquear, desbloqueie automaticamente
-    if (selectedImageToUnlock) {
+    if (selectedImageToUnlock && user) {
       handleUnlockImage(selectedImageToUnlock);
       setSelectedImageToUnlock(null);
     }
@@ -106,18 +93,13 @@ const Dashboard = () => {
     return image.expiresAt && new Date() > image.expiresAt;
   };
 
-  if (!isLoggedIn) {
-    return null;
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header 
-        userCredits={userCredits} 
+        userCredits={user?.credits || 0} 
         onCreditsAdded={handleCreditsAdded}
-        isLoggedIn={isLoggedIn}
-        onLogin={handleLogin}
-        onLogout={handleLogout}
+        isLoggedIn={!!user}
+        onLogout={logout}
       />
       
       <main className="pt-24 md:pt-32 flex-1">
@@ -146,7 +128,7 @@ const Dashboard = () => {
           setSelectedImageToUnlock(null);
         }}
         onCreditsAdded={handleCreditsAdded}
-        currentCredits={userCredits}
+        currentCredits={user?.credits || 0}
       />
     </div>
   );

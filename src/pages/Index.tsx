@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import GallerySection from '@/components/GallerySection';
@@ -11,17 +12,8 @@ import Footer from '@/components/Footer';
 import { AuthModal } from '@/components/AuthModal';
 
 const Index = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    setIsAuthModalOpen(false);
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-  };
 
   const handleAuthModalOpen = () => {
     setIsAuthModalOpen(true);
@@ -34,19 +26,19 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Header 
-        isLoggedIn={isLoggedIn}
-        onLogin={handleLogin}
-        onLogout={handleLogout}
+        isLoggedIn={!!user}
+        onLogout={logout}
         onAuthModalOpen={handleAuthModalOpen}
+        userCredits={user?.credits || 0}
       />
       <HeroSection 
-        isLoggedIn={isLoggedIn} 
+        isLoggedIn={!!user} 
         onAuthModalOpen={handleAuthModalOpen} 
       />
       <GallerySection />
       <HowItWorksSection />
       <PricingSection 
-        isLoggedIn={isLoggedIn} 
+        isLoggedIn={!!user} 
         onAuthModalOpen={handleAuthModalOpen} 
       />
       <TestimonialsSection />
@@ -56,7 +48,6 @@ const Index = () => {
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={handleAuthModalClose} 
-        onLogin={handleLogin} 
       />
     </div>
   );
