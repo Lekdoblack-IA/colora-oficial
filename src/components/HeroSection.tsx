@@ -1,7 +1,14 @@
+
 import { Button } from "@/components/ui/button";
 import { Heart, Star } from "lucide-react";
 import ScratchCard from './ScratchCard';
-const HeroSection = () => {
+
+interface HeroSectionProps {
+  isLoggedIn?: boolean;
+  onAuthModalOpen?: () => void;
+}
+
+const HeroSection = ({ isLoggedIn = false, onAuthModalOpen }: HeroSectionProps) => {
   return <section className="min-h-screen flex items-center justify-center px-4 pt-32 pb-16">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Lado esquerdo - Conteúdo */}
@@ -42,7 +49,7 @@ const HeroSection = () => {
             
             <div className="flex items-center space-x-1">
               {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />)}
-              <span className="ml-2 text-gray-600">4.9/5 </span>
+              <span className="ml-2 text-gray-600">4.9/5 </span>
             </div>
           </div>
         </div>
@@ -51,9 +58,10 @@ const HeroSection = () => {
         <div className="animate-fade-in-up" style={{
         animationDelay: '0.8s'
       }}>
-          <ScratchCard />
+          <ScratchCard isLoggedIn={isLoggedIn} onAuthModalOpen={onAuthModalOpen} />
         </div>
       </div>
     </section>;
 };
+
 export default HeroSection;

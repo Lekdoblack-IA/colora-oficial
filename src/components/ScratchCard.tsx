@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { useNavigate } from 'react-router-dom';
 
 interface Particle {
   x: number;
@@ -13,7 +14,12 @@ interface Particle {
   size: number;
 }
 
-const ScratchCard = () => {
+interface ScratchCardProps {
+  isLoggedIn?: boolean;
+  onAuthModalOpen?: () => void;
+}
+
+const ScratchCard = ({ isLoggedIn = false, onAuthModalOpen }: ScratchCardProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particleCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isScratching, setIsScratching] = useState(false);
@@ -21,6 +27,7 @@ const ScratchCard = () => {
   const [showButton, setShowButton] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
   const animationRef = useRef<number>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -238,6 +245,14 @@ const ScratchCard = () => {
     setIsScratching(false);
   };
 
+  const handleTransformClick = () => {
+    if (isLoggedIn) {
+      navigate('/dashboard');
+    } else {
+      onAuthModalOpen?.();
+    }
+  };
+
   return <div className="w-full max-w-sm mx-auto">
       <AspectRatio ratio={4 / 5}>
         <div className="relative w-full h-full rounded-3xl overflow-hidden border border-gray-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:border-transparent hover:-translate-y-1">
@@ -263,7 +278,10 @@ const ScratchCard = () => {
 
           {/* Botão flutuante */}
           {showButton && <div className="absolute inset-0 flex items-center justify-center animate-fade-in-up p-6" style={{ zIndex: 20 }}>
-              <Button className="bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base rounded-full shadow-lg animate-pulse-heart">
+              <Button 
+                onClick={handleTransformClick}
+                className="bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base rounded-full shadow-lg animate-pulse-heart"
+              >
                 <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 <span className="text-xs sm:text-sm">Transforme agora ✨</span>
               </Button>

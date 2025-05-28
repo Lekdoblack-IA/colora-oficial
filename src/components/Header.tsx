@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -10,19 +9,31 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 interface HeaderProps {
   userCredits?: number;
   onCreditsAdded?: (credits: number) => void;
+  isLoggedIn?: boolean;
+  onLogin?: () => void;
+  onAuthModalOpen?: () => void;
 }
 
-const Header = ({ userCredits = 5, onCreditsAdded }: HeaderProps) => {
+const Header = ({ 
+  userCredits = 5, 
+  onCreditsAdded, 
+  isLoggedIn: propIsLoggedIn,
+  onLogin,
+  onAuthModalOpen 
+}: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isBuyCreditsOpen, setIsBuyCreditsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Simulando usuário logado no dashboard
+  const [internalIsLoggedIn, setInternalIsLoggedIn] = useState(true); // Estado interno para dashboard
   const [userEmail] = useState("usuario@exemplo.com"); // Mock do email do usuário
   const navigate = useNavigate();
   const location = useLocation();
 
   // Verificar se está na página do dashboard
   const isDashboard = location.pathname === '/dashboard';
+  
+  // Usar estado externo se fornecido, senão usar interno
+  const isLoggedIn = propIsLoggedIn !== undefined ? propIsLoggedIn : internalIsLoggedIn;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,15 +44,32 @@ const Header = ({ userCredits = 5, onCreditsAdded }: HeaderProps) => {
   }, []);
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    navigate('/');
+    if (isDashboard) {
+      setInternalIsLoggedIn(false);
+      navigate('/');
+    } else {
+      // Lógica para página inicial - resetar estado se necessário
+    }
     console.log('Logout realizado');
   };
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
-    setIsAuthOpen(false);
-    navigate('/dashboard');
+    if (isDashboard) {
+      setInternalIsLoggedIn(true);
+      setIsAuthOpen(false);
+      navigate('/dashboard');
+    } else {
+      onLogin?.();
+      setIsAuthOpen(false);
+    }
+  };
+
+  const handleOpenAuthModal = () => {
+    if (onAuthModalOpen && !isDashboard) {
+      onAuthModalOpen();
+    } else {
+      setIsAuthOpen(true);
+    }
   };
 
   const handleBuyCredits = () => {
@@ -98,7 +126,7 @@ const Header = ({ userCredits = 5, onCreditsAdded }: HeaderProps) => {
             <div className="flex items-center space-x-4">
               {!isLoggedIn ? (
                 <Button 
-                  onClick={() => setIsAuthOpen(true)} 
+                  onClick={handleOpenAuthModal} 
                   variant="outline" 
                   className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200"
                 >
@@ -191,7 +219,10 @@ const Header = ({ userCredits = 5, onCreditsAdded }: HeaderProps) => {
         )}
       </header>
 
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onLogin={handleLogin} />
+      {/* Modal de autenticação apenas para dashboard */}
+      {isDashboard && (
+        <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onLogin={handleLogin} />
+      )}
       
       <BuyCreditsModal 
         isOpen={isBuyCreditsOpen}
