@@ -65,15 +65,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Simular API call - remover quando integrar com Supabase
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simular resposta da API
-      const userData: User = {
-        id: Date.now().toString(),
-        email,
-        name: email.split('@')[0],
-        credits: 5
-      };
-
-      setUser(userData);
+      // Verificar se é um usuário existente no localStorage
+      const existingUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+      const existingUser = existingUsers.find((u: any) => u.email === email);
+      
+      if (existingUser) {
+        // Usuário existente - usar créditos salvos
+        const userData: User = {
+          id: existingUser.id,
+          email,
+          name: existingUser.name,
+          credits: existingUser.credits
+        };
+        setUser(userData);
+      } else {
+        // Simular resposta da API para usuário não cadastrado localmente
+        const userData: User = {
+          id: Date.now().toString(),
+          email,
+          name: email.split('@')[0],
+          credits: 0 // Usuários fazendo login não ganham créditos iniciais
+        };
+        setUser(userData);
+      }
     } catch (error) {
       throw new Error('Erro ao fazer login. Verifique suas credenciais.');
     } finally {
@@ -87,13 +101,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Simular API call - remover quando integrar com Supabase
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simular resposta da API
+      // Criar novo usuário com 1 crédito inicial
       const userData: User = {
         id: Date.now().toString(),
         email,
         name,
-        credits: 5
+        credits: 1 // NOVO USUÁRIO GANHA 1 CRÉDITO GRATUITO
       };
+
+      // Salvar na lista de usuários registrados para controle local
+      const existingUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+      const newUserRecord = {
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+        credits: userData.credits
+      };
+      existingUsers.push(newUserRecord);
+      localStorage.setItem('registered_users', JSON.stringify(existingUsers));
 
       setUser(userData);
     } catch (error) {
@@ -109,7 +134,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const updateCredits = (credits: number) => {
     if (user) {
-      setUser({ ...user, credits });
+      const updatedUser = { ...user, credits };
+      setUser(updatedUser);
+      
+      // Atualizar também na lista de usuários registrados
+      const existingUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+      const updatedUsers = existingUsers.map((u: any) => 
+        u.email === user.email ? { ...u, credits } : u
+      );
+      localStorage.setItem('registered_users', JSON.stringify(updatedUsers));
     }
   };
 
