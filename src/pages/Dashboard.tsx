@@ -1,10 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { DashboardHowItWorks } from '@/components/dashboard/DashboardHowItWorks';
-import { CreditsCounter } from '@/components/dashboard/CreditsCounter';
 import { TransformImageSection } from '@/components/dashboard/TransformImageSection';
 import { UserImagesGallery } from '@/components/dashboard/UserImagesGallery';
 import { BuyCreditsModal } from '@/components/dashboard/BuyCreditsModal';
@@ -115,9 +113,6 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
           {/* Seção "Como Funciona" (Simplificada Em 3 passos) */}
           <DashboardHowItWorks />
-          
-          {/* Contador De Créditos */}
-          <CreditsCounter credits={userCredits} />
           
           {/* Seção "Transformar Nova Imagem" */}
           <TransformImageSection 
