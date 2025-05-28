@@ -8,6 +8,14 @@ interface UserProfile {
   email: string;
   name: string;
   credits: number;
+  avatar_url?: string;
+  first_name?: string;
+  last_name?: string;
+  google_id?: string;
+  locale?: string;
+  verified_email?: boolean;
+  last_login_at?: string;
+  login_count?: number;
 }
 
 interface AuthContextType {
@@ -41,12 +49,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Buscar perfil do usuário na tabela profiles
+  // Buscar perfil do usuário na tabela profiles com todos os novos campos
   const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select(`
+          id,
+          name,
+          email,
+          credits,
+          avatar_url,
+          first_name,
+          last_name,
+          google_id,
+          locale,
+          verified_email,
+          last_login_at,
+          login_count
+        `)
         .eq('id', userId)
         .single();
 
@@ -57,9 +78,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       return {
         id: data.id,
-        email: session?.user?.email || '',
+        email: data.email || session?.user?.email || '',
         name: data.name,
-        credits: data.credits
+        credits: data.credits,
+        avatar_url: data.avatar_url,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        google_id: data.google_id,
+        locale: data.locale,
+        verified_email: data.verified_email,
+        last_login_at: data.last_login_at,
+        login_count: data.login_count
       };
     } catch (error) {
       console.error('Erro ao buscar perfil:', error);
@@ -130,7 +159,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         password,
         options: {
           data: {
-            name: name
+            name: name,
+            full_name: name
           }
         }
       });
@@ -199,7 +229,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/dashboard`
+        redirectTo: `${window.location.origin}/dashboard`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+        scopes: 'openid email profile'
       }
     });
 

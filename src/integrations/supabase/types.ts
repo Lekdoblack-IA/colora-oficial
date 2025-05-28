@@ -11,25 +11,52 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           credits: number
+          email: string | null
+          first_name: string | null
+          google_id: string | null
           id: string
+          last_login_at: string | null
+          last_name: string | null
+          locale: string | null
+          login_count: number | null
           name: string
           updated_at: string
+          verified_email: boolean | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           credits?: number
+          email?: string | null
+          first_name?: string | null
+          google_id?: string | null
           id: string
+          last_login_at?: string | null
+          last_name?: string | null
+          locale?: string | null
+          login_count?: number | null
           name: string
           updated_at?: string
+          verified_email?: boolean | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           credits?: number
+          email?: string | null
+          first_name?: string | null
+          google_id?: string | null
           id?: string
+          last_login_at?: string | null
+          last_name?: string | null
+          locale?: string | null
+          login_count?: number | null
           name?: string
           updated_at?: string
+          verified_email?: boolean | null
         }
         Relationships: []
       }

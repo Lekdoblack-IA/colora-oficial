@@ -1,65 +1,69 @@
 
-import { Button } from "@/components/ui/button";
-import { User, ChevronDown, LogOut, CreditCard, Home, LayoutDashboard } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
+import { useAuth } from '@/contexts/AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { LogOut, User, CreditCard } from 'lucide-react';
 
 interface UserDropdownProps {
-  isDashboard: boolean;
-  userEmail: string;
   onLogout: () => void;
-  onBuyCredits: () => void;
-  onGoHome: () => void;
-  onGoDashboard: () => void;
+  userCredits: number;
 }
 
-export const UserDropdown = ({ 
-  isDashboard, 
-  userEmail, 
-  onLogout, 
-  onBuyCredits, 
-  onGoHome, 
-  onGoDashboard 
-}: UserDropdownProps) => {
+export const UserDropdown = ({ onLogout, userCredits }: UserDropdownProps) => {
+  const { user } = useAuth();
+
+  if (!user) return null;
+
+  const getInitials = () => {
+    if (user.first_name && user.last_name) {
+      return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
+    }
+    return user.name?.slice(0, 2).toUpperCase() || 'U';
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 flex items-center space-x-2">
-          <User className="h-4 w-4" />
-          <span className="hidden md:inline">Minha Conta</span>
-          <ChevronDown className="h-4 w-4" />
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={user.avatar_url} alt={user.name} />
+            <AvatarFallback>{getInitials()}</AvatarFallback>
+          </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg">
+      <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Minha Conta</p>
+            <p className="text-sm font-medium leading-none">{user.name}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {userEmail}
+              {user.email}
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
-        {isDashboard ? (
-          <DropdownMenuItem onClick={onGoHome}>
-            <Home className="mr-2 h-4 w-4" />
-            Voltar para o Inicio
-          </DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem onClick={onGoDashboard}>
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Ir para Dashboard
-          </DropdownMenuItem>
-        )}
-        
-        <DropdownMenuItem onClick={onBuyCredits}>
+        <DropdownMenuItem className="cursor-pointer">
           <CreditCard className="mr-2 h-4 w-4" />
-          Comprar Créditos
+          <span>{userCredits} créditos</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer">
+          <User className="mr-2 h-4 w-4" />
+          <span>Perfil</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onLogout}>
+        <DropdownMenuItem 
+          className="cursor-pointer text-red-600 focus:text-red-600" 
+          onClick={onLogout}
+        >
           <LogOut className="mr-2 h-4 w-4" />
-          Sair
+          <span>Sair</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
