@@ -86,7 +86,7 @@ const PricingSection = () => {
               </div>
 
               {/* Preço por crédito */}
-              <p className="text-pink-500 text-base font-medium mb-8">
+              <p className="text-pink-500 text-base font-medium mb-8 py-[15px]">
                 Apenas {selectedPkg?.pricePerCredit} Reais por imagem!
               </p>
 
