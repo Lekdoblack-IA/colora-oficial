@@ -37,7 +37,7 @@ const HeroSection = () => {
         }}>
             <div className="flex items-center space-x-2">
               <Heart className="w-5 h-5 text-red-500 fill-current" />
-              <span className="font-semibold">+ 1,485 Memórias Eternizadas</span>
+              <span className="font-semibold">+ 1,486 Memórias Eternizadas</span>
             </div>
             
             <div className="flex items-center space-x-1">
