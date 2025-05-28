@@ -41,7 +41,7 @@ const Footer = () => {
                 </button>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">Suporte (Whatsapp) </a>
+                
               </li>
             </ul>
           </div>
