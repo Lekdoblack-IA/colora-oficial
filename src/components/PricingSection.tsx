@@ -1,8 +1,6 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-
 const packages = [{
   id: 'mini',
   name: 'Pacote Mini',
@@ -31,14 +29,10 @@ const packages = [{
   note: 'Melhor custo benefício!',
   isPopular: false
 }];
-
 const PricingSection = () => {
   const [selectedPackage, setSelectedPackage] = useState('plus');
-  
   const selectedPkg = packages.find(pkg => pkg.id === selectedPackage);
-  
-  return (
-    <section className="py-20 px-4 bg-gray-50">
+  return <section className="py-20 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -65,7 +59,7 @@ const PricingSection = () => {
             {/* Conteúdo do card */}
             <div className="p-8 text-center">
               {/* Nome do pacote */}
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              <h2 className="font-bold text-gray-900 mb-3 text-3xl">
                 {selectedPkg?.name}
               </h2>
 
@@ -76,21 +70,10 @@ const PricingSection = () => {
 
               {/* Toggle de pacotes dentro do card */}
               <div className="mb-6">
-                <ToggleGroup 
-                  type="single" 
-                  value={selectedPackage} 
-                  onValueChange={(value) => value && setSelectedPackage(value)}
-                  className="inline-flex rounded-full bg-gray-100 p-1"
-                >
-                  {packages.map(pkg => (
-                    <ToggleGroupItem
-                      key={pkg.id}
-                      value={pkg.id}
-                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-pink-500 data-[state=on]:to-red-500 data-[state=on]:text-white data-[state=on]:shadow-md text-gray-600 hover:text-gray-900"
-                    >
+                <ToggleGroup type="single" value={selectedPackage} onValueChange={value => value && setSelectedPackage(value)} className="inline-flex rounded-full bg-gray-100 p-1">
+                  {packages.map(pkg => <ToggleGroupItem key={pkg.id} value={pkg.id} className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-pink-500 data-[state=on]:to-red-500 data-[state=on]:text-white data-[state=on]:shadow-md text-gray-600 hover:text-gray-900">
                       {pkg.name.split(' ')[1]}
-                    </ToggleGroupItem>
-                  ))}
+                    </ToggleGroupItem>)}
                 </ToggleGroup>
               </div>
 
@@ -113,19 +96,13 @@ const PricingSection = () => {
               </Button>
 
               {/* Nota */}
-              {selectedPkg?.note && (
-                <p className={`text-sm ${
-                  selectedPkg.isPopular ? 'text-green-600 font-medium' : 'text-gray-500'
-                }`}>
+              {selectedPkg?.note && <p className={`text-sm ${selectedPkg.isPopular ? 'text-green-600 font-medium' : 'text-gray-500'}`}>
                   {selectedPkg.note}
-                </p>
-              )}
+                </p>}
             </div>
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default PricingSection;
