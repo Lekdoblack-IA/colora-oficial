@@ -111,21 +111,28 @@ const ScratchCard = () => {
             x: particle.x + particle.vx,
             y: particle.y + particle.vy,
             life: particle.life - 1,
-            vy: particle.vy + 0.1, // gravity
+            vy: particle.vy + 0.05, // reduced gravity for lighter effect
           }))
           .filter(particle => particle.life > 0);
       });
 
-      // Draw particles
+      // Draw particles with golden glitter effect
       particles.forEach(particle => {
         const alpha = particle.life / particle.maxLife;
         const size = particle.size * alpha;
         
         ctx.save();
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = `hsl(${45 + Math.random() * 30}, 100%, ${70 + Math.random() * 30}%)`;
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-        ctx.shadowBlur = 4;
+        ctx.globalAlpha = alpha * 0.8; // more subtle opacity
+        
+        // Golden glitter colors
+        const hue = 45 + Math.random() * 15; // golden range
+        const saturation = 80 + Math.random() * 20;
+        const lightness = 70 + Math.random() * 20;
+        ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        
+        // Subtle glow effect
+        ctx.shadowColor = 'rgba(255, 215, 0, 0.3)';
+        ctx.shadowBlur = 2;
         
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, size, 0, Math.PI * 2);
@@ -151,17 +158,17 @@ const ScratchCard = () => {
 
   const createParticles = (x: number, y: number) => {
     const newParticles: Particle[] = [];
-    const particleCount = 3 + Math.random() * 3; // 3-6 particles
+    const particleCount = 1 + Math.random() * 2; // reduced from 3-6 to 1-3 particles
 
     for (let i = 0; i < particleCount; i++) {
       newParticles.push({
-        x: x + (Math.random() - 0.5) * 20,
-        y: y + (Math.random() - 0.5) * 20,
-        vx: (Math.random() - 0.5) * 4,
-        vy: (Math.random() - 0.5) * 4 - 2,
-        life: 30 + Math.random() * 20,
-        maxLife: 30 + Math.random() * 20,
-        size: 2 + Math.random() * 3,
+        x: x + (Math.random() - 0.5) * 10, // reduced spread
+        y: y + (Math.random() - 0.5) * 10,
+        vx: (Math.random() - 0.5) * 2, // reduced velocity
+        vy: (Math.random() - 0.5) * 2 - 1,
+        life: 20 + Math.random() * 10, // shorter life for better performance
+        maxLife: 20 + Math.random() * 10,
+        size: 1 + Math.random() * 2, // smaller particles
       });
     }
 
@@ -200,8 +207,10 @@ const ScratchCard = () => {
       y
     } = getEventPosition(e);
 
-    // Create particles at scratch position
-    createParticles(x, y);
+    // Create particles at scratch position with reduced frequency
+    if (Math.random() < 0.3) { // only create particles 30% of the time for better performance
+      createParticles(x, y);
+    }
 
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
