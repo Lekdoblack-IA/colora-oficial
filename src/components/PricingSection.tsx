@@ -84,9 +84,9 @@ const PricingSection = () => {
                       R$ {pkg.totalPrice.toFixed(2)}
                     </div>
                     <div className="flex items-center justify-center space-x-2">
-                      <span className="text-2xl font-bold text-pink-600">R${pkg.pricePerCredit}</span>
-                      <span className="text-gray-600 text-lg">por imagem</span>
-                      {pkg.pricePerCredit < 5 && <span className="text-gray-400 line-through text-base">R$5</span>}
+                      
+                      <span className="text-base font-light text-gray-500">R$4 por imagem</span>
+                      {pkg.pricePerCredit < 5}
                     </div>
                   </div>
                   
