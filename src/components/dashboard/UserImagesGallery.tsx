@@ -99,7 +99,7 @@ export const UserImagesGallery = ({
         const isLocked = !image.isUnlocked && !expired;
         return <div key={image.id} className="relative group">
               <div className="relative overflow-hidden rounded-lg shadow-md">
-                <img src={image.transformedUrl} alt="Desenho transformado" className={`w-full h-48 md:h-64 object-cover transition-all duration-300 ${isLocked ? 'filter blur-sm' : ''}`} />
+                <img src={image.transformedUrl} alt="Desenho transformado" className={`w-full h-48 md:h-64 object-cover transition-all duration-300 ${isLocked ? 'filter blur-[2px]' : ''}`} />
                 
                 {/* Overlay para imagens bloqueadas */}
                 {isLocked && <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
