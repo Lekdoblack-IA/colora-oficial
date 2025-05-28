@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Upload, X, Heart } from 'lucide-react';
+import { Upload, X, Heart, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
