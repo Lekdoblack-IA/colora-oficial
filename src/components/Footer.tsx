@@ -34,14 +34,10 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Galeria
-                </a>
+                
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Suporte
-                </a>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">Suporte (Whatsapp) </a>
               </li>
             </ul>
           </div>
