@@ -1,6 +1,16 @@
+
 import { Heart } from 'lucide-react';
+
 const Footer = () => {
-  return <footer className="bg-gray-900 text-white py-12">
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <footer className="bg-gray-900 text-white py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo e Descrição */}
@@ -15,7 +25,6 @@ const Footer = () => {
             <div className="flex items-center text-sm text-gray-500">
               <span>Transformando memórias em experiência.</span>
               <Heart className="w-4 h-4 mx-1 text-pink-500" />
-              
             </div>
           </div>
 
@@ -24,20 +33,23 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Links Úteis</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <button 
+                  onClick={() => scrollToSection('how-it-works')}
+                  className="text-gray-400 hover:text-white transition-colors cursor-pointer text-left"
+                >
                   Como Funciona
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <button 
+                  onClick={() => scrollToSection('pricing')}
+                  className="text-gray-400 hover:text-white transition-colors cursor-pointer text-left"
+                >
                   Preços
-                </a>
+                </button>
               </li>
               <li>
-                
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">Suporte (Whatsapp) </a>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">Suporte (Whatsapp) </a>
               </li>
             </ul>
           </div>
@@ -47,9 +59,12 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Suporte</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <button 
+                  onClick={() => scrollToSection('faq')}
+                  className="text-gray-400 hover:text-white transition-colors cursor-pointer text-left"
+                >
                   Central de Ajuda
-                </a>
+                </button>
               </li>
               <li>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -88,6 +103,8 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 };
+
 export default Footer;

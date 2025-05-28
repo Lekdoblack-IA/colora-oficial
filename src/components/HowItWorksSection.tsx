@@ -63,7 +63,9 @@ const HowItWorksSection = () => {
     threshold: 0.2,
     rootMargin: '-50px'
   });
-  return <section ref={sectionRef} className="px-4 py-[40px]">
+  
+  return (
+    <section id="how-it-works" ref={sectionRef} className="px-4 py-[40px]">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold mb-4 md:text-5xl">
@@ -85,6 +87,7 @@ const HowItWorksSection = () => {
           
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
 export default HowItWorksSection;

@@ -24,7 +24,8 @@ const faqItems = [{
   answer: "Claro! Adoramos ver nossos clientes compartilhando suas criações. Use a hashtag #Colora para que possamos encontrar."
 }];
 const FAQSection = () => {
-  return <section className="px-4 bg-gray-50 py-[40px]">
+  return (
+    <section id="faq" className="px-4 bg-gray-50 py-[40px]">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -53,6 +54,8 @@ const FAQSection = () => {
           </Accordion>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default FAQSection;
