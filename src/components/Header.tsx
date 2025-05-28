@@ -1,8 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { User, ChevronDown } from "lucide-react";
 import { AuthModal } from './AuthModal';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -15,14 +17,17 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
   const handleLogout = () => {
     setIsLoggedIn(false);
     console.log('Logout realizado');
   };
+
   const handleLogin = () => {
     setIsLoggedIn(true);
     setIsAuthOpen(false);
   };
+
   return <>
       <header className="fixed top-0 left-0 right-0 z-50">
         {/* Header principal com glassmorphism */}
@@ -30,19 +35,47 @@ const Header = () => {
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             {/* Logo - Desktop */}
             <div className="hidden md:flex items-center">
-              {isScrolled ? <img alt="Clr♡" className="h-8 transition-all duration-300" src="/lovable-uploads/7f340ff3-81d4-4e87-b1ff-669326a89482.png" /> : <img src="/lovable-uploads/a87e684d-fed7-4b3a-88ff-3c24e99d5962.png" alt="Colora♡" className="h-10 transition-all duration-300" />}
+              {isScrolled ? 
+                <img 
+                  alt="Clr♡" 
+                  className="h-8 transition-all duration-300" 
+                  src="/lovable-uploads/0d4e9f12-e51b-41e2-b9cd-9910f8f3e9ee.png" 
+                /> : 
+                <img 
+                  src="/lovable-uploads/ee0393c6-5834-4e27-b4e2-7731aac513e6.png" 
+                  alt="Colora♡" 
+                  className="h-10 transition-all duration-300" 
+                />
+              }
             </div>
 
             {/* Logo - Mobile (centralizada) */}
             <div className="md:hidden absolute left-1/2 transform -translate-x-1/2">
-              {isScrolled ? <img src="/lovable-uploads/4b9d0e21-429d-4ec8-a995-7dc39afd21d8.png" alt="Clr♡" className="h-6 transition-all duration-300" /> : <img src="/lovable-uploads/a87e684d-fed7-4b3a-88ff-3c24e99d5962.png" alt="Colora♡" className="h-8 transition-all duration-300" />}
+              {isScrolled ? 
+                <img 
+                  src="/lovable-uploads/0d4e9f12-e51b-41e2-b9cd-9910f8f3e9ee.png" 
+                  alt="Clr♡" 
+                  className="h-6 transition-all duration-300" 
+                /> : 
+                <img 
+                  src="/lovable-uploads/ee0393c6-5834-4e27-b4e2-7731aac513e6.png" 
+                  alt="Colora♡" 
+                  className="h-8 transition-all duration-300" 
+                />
+              }
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:block">
-              {!isLoggedIn ? <Button onClick={() => setIsAuthOpen(true)} variant="outline" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200">
+              {!isLoggedIn ? 
+                <Button 
+                  onClick={() => setIsAuthOpen(true)} 
+                  variant="outline" 
+                  className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200"
+                >
                   Entrar
-                </Button> : <DropdownMenu>
+                </Button> : 
+                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 flex items-center space-x-2">
                       <User className="h-4 w-4" />
@@ -61,7 +94,8 @@ const Header = () => {
                       Sair
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu>}
+                </DropdownMenu>
+              }
             </div>
 
             {/* Mobile - Espaço vazio para balancear o layout */}
@@ -82,4 +116,5 @@ const Header = () => {
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onLogin={handleLogin} />
     </>;
 };
+
 export default Header;
