@@ -137,9 +137,13 @@ export const useAuthForm = () => {
       // Remove formatação do telefone antes de enviar
       const cleanPhone = formData.phone.replace(/\D/g, '');
       
-      await register(formData.name, formData.email, formData.password, {
+      // Criar um objeto com os metadados do usuário incluindo o telefone
+      const userMetadata = {
+        full_name: formData.name,
         phone: cleanPhone
-      });
+      };
+      
+      await register(formData.email, formData.password, userMetadata);
       toast({
         title: "Conta criada com sucesso!",
         description: "Bem-vindo ao Colora! Você ganhou 1 crédito gratuito.",
