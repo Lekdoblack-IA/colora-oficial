@@ -45,20 +45,22 @@ export const ImageActions = ({
       {!isUnlocked ? (
         <Button 
           onClick={onUnlockClick} 
-          className={`w-full min-h-[44px] transition-all duration-200 ${
+          className={`w-full min-h-[44px] transition-all duration-500 ease-in-out transform ${
             isConfirming 
-              ? 'bg-orange-500 hover:bg-orange-600 animate-pulse' 
-              : 'bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600'
+              ? 'bg-orange-500 hover:bg-orange-600 scale-105 shadow-lg' 
+              : 'bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 hover:scale-102 shadow-md'
           }`}
           size="sm"
         >
-          <Download className="w-4 h-4 mr-2" />
-          {isConfirming ? 'Tem certeza? (-1 Crédito)' : 'Desbloquear'}
+          <Download className={`w-4 h-4 mr-2 transition-transform duration-300 ${isConfirming ? 'animate-pulse' : ''}`} />
+          <span className="transition-all duration-300 ease-in-out">
+            {isConfirming ? 'Tem certeza? (-1 Crédito)' : 'Desbloquear'}
+          </span>
         </Button>
       ) : (
         <Button 
           onClick={handleDownload} 
-          className="w-full bg-green-600 hover:bg-green-700 min-h-[44px]" 
+          className="w-full bg-green-600 hover:bg-green-700 min-h-[44px] transition-all duration-300 hover:scale-102 hover:shadow-lg" 
           size="sm"
         >
           <Download className="w-4 h-4 mr-2" />
