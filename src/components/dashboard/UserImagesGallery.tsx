@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Lock, Download, Clock, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -55,9 +56,24 @@ export const UserImagesGallery = ({
   onDeleteImage,
   isImageExpired
 }: UserImagesGalleryProps) => {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const [confirmingUnlock, setConfirmingUnlock] = useState<string | null>(null);
+
+  const handleUnlockClick = (imageId: string) => {
+    if (confirmingUnlock === imageId) {
+      // Segunda clicada - confirma o desbloqueio
+      onUnlockImage(imageId);
+      setConfirmingUnlock(null);
+    } else {
+      // Primeira clicada - ativa confirmação
+      setConfirmingUnlock(imageId);
+      
+      // Remove a confirmação após 5 segundos se não clicar novamente
+      setTimeout(() => {
+        setConfirmingUnlock(prev => prev === imageId ? null : prev);
+      }, 5000);
+    }
+  };
 
   const handleDownload = (imageUrl: string, imageId: string) => {
     // Simular download
@@ -126,6 +142,7 @@ export const UserImagesGallery = ({
         {images.map(image => {
           const expired = isImageExpired(image);
           const isLocked = !image.isUnlocked && !expired;
+          const isConfirming = confirmingUnlock === image.id;
           
           return (
             <div key={image.id} className="relative group">
@@ -186,12 +203,16 @@ export const UserImagesGallery = ({
                   <div className="space-y-2">
                     {!image.isUnlocked ? (
                       <Button 
-                        onClick={() => onUnlockImage(image.id)} 
-                        className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 min-h-[44px]" 
+                        onClick={() => handleUnlockClick(image.id)} 
+                        className={`w-full min-h-[44px] transition-all duration-200 ${
+                          isConfirming 
+                            ? 'bg-orange-500 hover:bg-orange-600 animate-pulse' 
+                            : 'bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600'
+                        }`}
                         size="sm"
                       >
                         <Download className="w-4 h-4 mr-2" />
-                        Desbloquear
+                        {isConfirming ? 'Tem certeza? (-1 Crédito)' : 'Desbloquear'}
                       </Button>
                     ) : (
                       <Button 
