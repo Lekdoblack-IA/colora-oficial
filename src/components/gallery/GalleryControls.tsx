@@ -8,11 +8,11 @@ const GalleryControls = ({
   onNext
 }: GalleryControlsProps) => {
   return <>
-      <button onClick={onPrevious} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110 z-10 mx-[130px]">
+      <button onClick={onPrevious} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110 z-10 mx-[225px]">
         <ChevronLeft className="w-6 h-6" />
       </button>
 
-      <button onClick={onNext} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110 z-10 mx-[130px] my-0">
+      <button onClick={onNext} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110 z-10 my-0 mx-[225px]">
         <ChevronRight className="w-6 h-6" />
       </button>
     </>;
