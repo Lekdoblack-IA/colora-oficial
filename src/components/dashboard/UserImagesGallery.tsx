@@ -73,19 +73,19 @@ export const UserImagesGallery = ({
 
   if (images.length === 0) {
     return (
-      <section className="bg-white rounded-2xl p-8 shadow-sm">
+      <section className="bg-white rounded-2xl p-4 md:p-8 shadow-sm">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
             Suas Imagens
           </h2>
-          <div className="py-12">
-            <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-              <Download className="w-8 h-8 text-gray-400" />
+          <div className="py-8 md:py-12">
+            <div className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+              <Download className="w-6 h-6 md:w-8 md:h-8 text-gray-400" />
             </div>
-            <p className="text-gray-600">
+            <p className="text-sm md:text-base text-gray-600">
               Você ainda não transformou nenhuma imagem.
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-xs md:text-sm text-gray-500 mt-1">
               Use a seção acima para começar!
             </p>
           </div>
@@ -95,17 +95,17 @@ export const UserImagesGallery = ({
   }
 
   return (
-    <section className="bg-white rounded-2xl p-8 shadow-sm">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+    <section className="bg-white rounded-2xl p-4 md:p-8 shadow-sm">
+      <div className="text-center mb-6 md:mb-8">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
           Suas Imagens
         </h2>
-        <p className="text-gray-600">
+        <p className="text-sm md:text-base text-gray-600">
           {images.length} {images.length === 1 ? 'imagem transformada' : 'imagens transformadas'}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {images.map((image) => {
           const expired = isImageExpired(image);
           const isLocked = !image.isUnlocked && !expired;
@@ -116,7 +116,7 @@ export const UserImagesGallery = ({
                 <img 
                   src={image.transformedUrl} 
                   alt="Desenho transformado"
-                  className={`w-full h-64 object-cover transition-all duration-300 ${
+                  className={`w-full h-48 md:h-64 object-cover transition-all duration-300 ${
                     isLocked ? 'filter blur-sm' : ''
                   }`}
                 />
@@ -125,9 +125,9 @@ export const UserImagesGallery = ({
                 {isLocked && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="text-center text-white">
-                      <Lock className="w-8 h-8 mx-auto mb-2" />
-                      <p className="font-medium">Bloqueada</p>
-                      <p className="text-sm opacity-90">Use créditos para liberar</p>
+                      <Lock className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2" />
+                      <p className="font-medium text-sm md:text-base">Bloqueada</p>
+                      <p className="text-xs md:text-sm opacity-90">Use créditos para liberar</p>
                     </div>
                   </div>
                 )}
@@ -136,9 +136,9 @@ export const UserImagesGallery = ({
                 {expired && (
                   <div className="absolute inset-0 bg-red-500 bg-opacity-70 flex items-center justify-center">
                     <div className="text-center text-white">
-                      <Clock className="w-8 h-8 mx-auto mb-2" />
-                      <p className="font-medium">Expirada</p>
-                      <p className="text-sm opacity-90">Esta imagem não está mais disponível</p>
+                      <Clock className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2" />
+                      <p className="font-medium text-sm md:text-base">Expirada</p>
+                      <p className="text-xs md:text-sm opacity-90">Esta imagem não está mais disponível</p>
                     </div>
                   </div>
                 )}
@@ -147,7 +147,7 @@ export const UserImagesGallery = ({
               {/* Informações da imagem */}
               <div className="mt-3 space-y-2">
                 <div className="flex justify-between items-start">
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs md:text-sm text-gray-600">
                     {image.createdAt.toLocaleDateString('pt-BR')}
                   </div>
                   {image.expiresAt && !image.isUnlocked && !expired && (
@@ -161,7 +161,7 @@ export const UserImagesGallery = ({
                     {!image.isUnlocked ? (
                       <Button 
                         onClick={() => onUnlockImage(image.id)}
-                        className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600"
+                        className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 min-h-[44px]"
                         size="sm"
                       >
                         <Download className="w-4 h-4 mr-2" />
@@ -170,7 +170,7 @@ export const UserImagesGallery = ({
                     ) : (
                       <Button 
                         onClick={() => handleDownload(image.transformedUrl, image.id)}
-                        className="w-full bg-green-600 hover:bg-green-700"
+                        className="w-full bg-green-600 hover:bg-green-700 min-h-[44px]"
                         size="sm"
                       >
                         <Download className="w-4 h-4 mr-2" />
