@@ -33,47 +33,88 @@ const galleryImages = [
 const GallerySection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     if (!isAutoPlaying) return;
 
     const interval = setInterval(() => {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % galleryImages.length);
-        setIsTransitioning(false);
-      }, 150);
+      setCurrentIndex((prev) => (prev + 1) % galleryImages.length);
     }, 4000);
 
     return () => clearInterval(interval);
   }, [isAutoPlaying]);
 
   const nextSlide = () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % galleryImages.length);
-      setIsTransitioning(false);
-    }, 150);
+    setCurrentIndex((prev) => (prev + 1) % galleryImages.length);
   };
 
   const prevSlide = () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
-      setIsTransitioning(false);
-    }, 150);
+    setCurrentIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
   };
 
   const goToSlide = (index: number) => {
-    if (isTransitioning || index === currentIndex) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentIndex(index);
-      setIsTransitioning(false);
-    }, 150);
+    if (index === currentIndex) return;
+    setCurrentIndex(index);
+  };
+
+  const getSlidePosition = (index: number) => {
+    const diff = index - currentIndex;
+    const totalImages = galleryImages.length;
+    
+    // Normalize the difference to handle circular navigation
+    let normalizedDiff = diff;
+    if (Math.abs(diff) > totalImages / 2) {
+      normalizedDiff = diff > 0 ? diff - totalImages : diff + totalImages;
+    }
+    
+    return normalizedDiff;
+  };
+
+  const getSlideStyles = (position: number) => {
+    const isActive = position === 0;
+    const isPrev = position === -1;
+    const isNext = position === 1;
+    const isFarLeft = position < -1;
+    const isFarRight = position > 1;
+
+    let transform = '';
+    let opacity = 0;
+    let zIndex = 0;
+    let scale = 0.8;
+
+    if (isActive) {
+      transform = 'translateX(0px) translateZ(0px) rotateY(0deg)';
+      opacity = 1;
+      zIndex = 3;
+      scale = 1;
+    } else if (isPrev) {
+      transform = 'translateX(-120px) translateZ(-100px) rotateY(25deg)';
+      opacity = 0.7;
+      zIndex = 2;
+      scale = 0.85;
+    } else if (isNext) {
+      transform = 'translateX(120px) translateZ(-100px) rotateY(-25deg)';
+      opacity = 0.7;
+      zIndex = 2;
+      scale = 0.85;
+    } else if (isFarLeft) {
+      transform = 'translateX(-200px) translateZ(-200px) rotateY(45deg)';
+      opacity = 0.3;
+      zIndex = 1;
+      scale = 0.7;
+    } else if (isFarRight) {
+      transform = 'translateX(200px) translateZ(-200px) rotateY(-45deg)';
+      opacity = 0.3;
+      zIndex = 1;
+      scale = 0.7;
+    }
+
+    return {
+      transform: `${transform} scale(${scale})`,
+      opacity,
+      zIndex,
+      transition: 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+    };
   };
 
   return (
@@ -91,123 +132,118 @@ const GallerySection = () => {
           </p>
         </div>
 
-        {/* Carrossel */}
+        {/* Carrossel 3D */}
         <div 
-          className="relative overflow-hidden"
+          className="relative h-[500px] flex items-center justify-center overflow-hidden"
+          style={{ perspective: '1000px' }}
           onMouseEnter={() => setIsAutoPlaying(false)}
           onMouseLeave={() => setIsAutoPlaying(true)}
         >
-          {/* Container principal */}
-          <div className="flex items-center justify-center">
-            {/* Desktop: 3 imagens com transição suave */}
-            <div className="hidden md:flex items-center space-x-6 relative">
-              <div 
-                className="flex transition-transform duration-700 ease-in-out"
-                style={{
-                  transform: `translateX(${isTransitioning ? '-100px' : '0px'})`,
-                  opacity: isTransitioning ? 0.3 : 1
-                }}
-              >
-                {[-1, 0, 1].map((offset) => {
-                  const index = (currentIndex + offset + galleryImages.length) % galleryImages.length;
-                  const image = galleryImages[index];
-                  const isActive = offset === 0;
-                  
-                  return (
-                    <div
-                      key={`${image.id}-${offset}`}
-                      className={`transition-all duration-700 ease-out ${
-                        isActive 
-                          ? 'scale-100 opacity-100 z-10' 
-                          : 'scale-90 opacity-60 blur-sm'
-                      }`}
-                      onClick={() => goToSlide(index)}
-                    >
-                      {/* Proporção 4:5 (320x400) */}
-                      <div className="w-80 h-96 rounded-3xl bg-white border border-black overflow-hidden cursor-pointer hover:border-transparent hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                        <img
-                          src={image.image}
-                          alt={image.title}
-                          className="w-full h-full object-cover"
-                          style={{ aspectRatio: '4/5' }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Mobile: 1 imagem com peek e transição suave */}
-            <div className="md:hidden relative w-full max-w-sm mx-auto">
-              <div 
-                className="flex items-center justify-center transition-all duration-700 ease-in-out"
-                style={{
-                  transform: `translateX(${isTransitioning ? '20px' : '0px'})`,
-                  opacity: isTransitioning ? 0.5 : 1
-                }}
-              >
-                {/* Imagem anterior (peek) */}
-                <div className="absolute left-0 w-16 h-80 rounded-l-3xl bg-white border border-black overflow-hidden opacity-50 blur-sm -z-10">
-                  <img
-                    src={galleryImages[(currentIndex - 1 + galleryImages.length) % galleryImages.length].image}
-                    alt="Anterior"
-                    className="w-full h-full object-cover"
-                    style={{ aspectRatio: '4/5' }}
-                  />
+          {/* Desktop: Carrossel 3D com múltiplas imagens */}
+          <div className="hidden md:block relative w-full h-full">
+            {galleryImages.map((image, index) => {
+              const position = getSlidePosition(index);
+              const styles = getSlideStyles(position);
+              
+              return (
+                <div
+                  key={image.id}
+                  className="absolute top-1/2 left-1/2 cursor-pointer"
+                  style={{
+                    ...styles,
+                    transformOrigin: 'center center',
+                    marginLeft: '-160px', // Half of image width (320px/2)
+                    marginTop: '-200px',  // Half of image height (400px/2)
+                  }}
+                  onClick={() => goToSlide(index)}
+                >
+                  <div className="w-80 h-96 rounded-3xl bg-white border border-black overflow-hidden shadow-2xl hover:shadow-3xl transition-shadow duration-300">
+                    <img
+                      src={image.image}
+                      alt={image.title}
+                      className="w-full h-full object-cover"
+                      style={{ aspectRatio: '4/5' }}
+                    />
+                  </div>
                 </div>
+              );
+            })}
+          </div>
 
-                {/* Imagem principal - Proporção 4:5 */}
-                <div className="w-72 h-96 rounded-3xl bg-white border border-black overflow-hidden shadow-lg">
-                  <img
-                    src={galleryImages[currentIndex].image}
-                    alt={galleryImages[currentIndex].title}
-                    className="w-full h-full object-cover"
-                    style={{ aspectRatio: '4/5' }}
-                  />
+          {/* Mobile: Carrossel simplificado */}
+          <div className="md:hidden relative w-full h-full flex items-center justify-center">
+            {galleryImages.map((image, index) => {
+              const isActive = index === currentIndex;
+              const isPrev = index === (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+              const isNext = index === (currentIndex + 1) % galleryImages.length;
+              
+              let transform = 'translateX(400px)';
+              let opacity = 0;
+              let zIndex = 0;
+              
+              if (isActive) {
+                transform = 'translateX(0px)';
+                opacity = 1;
+                zIndex = 3;
+              } else if (isPrev) {
+                transform = 'translateX(-300px) scale(0.8)';
+                opacity = 0.4;
+                zIndex = 1;
+              } else if (isNext) {
+                transform = 'translateX(300px) scale(0.8)';
+                opacity = 0.4;
+                zIndex = 1;
+              }
+              
+              return (
+                <div
+                  key={image.id}
+                  className="absolute top-1/2 left-1/2"
+                  style={{
+                    transform: `translate(-50%, -50%) ${transform}`,
+                    opacity,
+                    zIndex,
+                    transition: 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  }}
+                >
+                  <div className="w-72 h-96 rounded-3xl bg-white border border-black overflow-hidden shadow-xl">
+                    <img
+                      src={image.image}
+                      alt={image.title}
+                      className="w-full h-full object-cover"
+                      style={{ aspectRatio: '4/5' }}
+                    />
+                  </div>
                 </div>
-
-                {/* Imagem próxima (peek) */}
-                <div className="absolute right-0 w-16 h-80 rounded-r-3xl bg-white border border-black overflow-hidden opacity-50 blur-sm -z-10">
-                  <img
-                    src={galleryImages[(currentIndex + 1) % galleryImages.length].image}
-                    alt="Próxima"
-                    className="w-full h-full object-cover"
-                    style={{ aspectRatio: '4/5' }}
-                  />
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
 
           {/* Controles */}
           <button
             onClick={prevSlide}
-            disabled={isTransitioning}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110 z-10"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
 
           <button
             onClick={nextSlide}
-            disabled={isTransitioning}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110 z-10"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
 
           {/* Indicadores */}
-          <div className="flex justify-center space-x-2 mt-8">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
             {galleryImages.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                disabled={isTransitioning}
-                className={`w-3 h-3 rounded-full transition-all duration-500 disabled:cursor-not-allowed ${
+                className={`w-3 h-3 rounded-full transition-all duration-500 ${
                   index === currentIndex
                     ? 'bg-gradient-to-r from-pink-500 to-red-500 scale-125'
-                    : 'bg-gray-300 hover:bg-gray-400'
+                    : 'bg-white/60 hover:bg-white/80'
                 }`}
               />
             ))}
