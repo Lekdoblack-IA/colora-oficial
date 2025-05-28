@@ -2,27 +2,27 @@
 export const galleryImages = [
   {
     id: 1,
-    title: "Casal na Praia",
-    image: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=320&h=400&fit=crop"
+    title: "Festa de Aniversário",
+    image: "/lovable-uploads/a7fe5893-ebfc-4800-804c-46ae3127b649.png"
   },
   {
     id: 2,
-    title: "Família no Parque",
-    image: "https://images.unsplash.com/photo-1511895426328-dc8714ffe0d8?w=320&h=400&fit=crop"
+    title: "Casamento Romântico",
+    image: "/lovable-uploads/fe0cab09-d673-46d2-a8c2-b0399adf5ba6.png"
   },
   {
     id: 3,
-    title: "Cachorro Fofo",
-    image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=320&h=400&fit=crop"
+    title: "Momento com Pet",
+    image: "/lovable-uploads/8b435186-61a8-4d54-a916-c037e2abd2f6.png"
   },
   {
     id: 4,
-    title: "Momento Romântico",
-    image: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=320&h=400&fit=crop"
+    title: "Viagem Romântica",
+    image: "/lovable-uploads/f1c9b423-81d0-4dfe-867a-c743d78b09fd.png"
   },
   {
     id: 5,
-    title: "Amigos Felizes",
-    image: "https://images.unsplash.com/photo-1529068755536-a5ade0dcb4e8?w=320&h=400&fit=crop"
+    title: "Aventura em Família",
+    image: "/lovable-uploads/f533070e-8777-4de1-b3ee-26dd4f5990a3.png"
   }
 ];
