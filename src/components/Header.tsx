@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { User, ChevronDown } from "lucide-react";
+import { Heart, User, ChevronDown } from "lucide-react";
 import { AuthModal } from './AuthModal';
 import {
   DropdownMenu,
@@ -41,14 +41,13 @@ const Header = () => {
         <div className="bg-white/80 backdrop-blur-md border-b border-white/20 px-4 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center">
-              <img 
-                src="/lovable-uploads/f6716406-b830-41a1-adf1-c02666fd3e26.png" 
-                alt="Colora" 
-                className={`transition-all duration-300 ${
-                  isScrolled ? 'h-8' : 'h-12'
-                }`}
-              />
+            <div className="flex items-center space-x-2">
+              <Heart className="h-6 w-6 text-red-500 fill-current" />
+              <span className={`font-bold transition-all duration-300 ${
+                isScrolled ? 'text-lg' : 'text-2xl'
+              }`}>
+                {isScrolled ? 'Clr♡' : 'Colora ♡'}
+              </span>
             </div>
 
             {/* Desktop Navigation */}
