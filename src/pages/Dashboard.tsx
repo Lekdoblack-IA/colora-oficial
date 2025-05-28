@@ -109,7 +109,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header userCredits={userCredits} onCreditsAdded={handleCreditsAdded} />
       
-      <main className="pt-16 md:pt-24 flex-1">
+      <main className="pt-24 md:pt-32 flex-1">
         <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-8 space-y-6 md:space-y-12">
           <DashboardHowItWorks />
           <TransformImageSection 
