@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          auth_provider: Database["public"]["Enums"]["auth_provider_type"]
           avatar_url: string | null
           created_at: string
           credits: number
@@ -27,6 +28,7 @@ export type Database = {
           verified_email: boolean | null
         }
         Insert: {
+          auth_provider?: Database["public"]["Enums"]["auth_provider_type"]
           avatar_url?: string | null
           created_at?: string
           credits?: number
@@ -43,6 +45,7 @@ export type Database = {
           verified_email?: boolean | null
         }
         Update: {
+          auth_provider?: Database["public"]["Enums"]["auth_provider_type"]
           avatar_url?: string | null
           created_at?: string
           credits?: number
@@ -68,7 +71,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      auth_provider_type: "google" | "email" | "facebook"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -183,6 +186,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      auth_provider_type: ["google", "email", "facebook"],
+    },
   },
 } as const

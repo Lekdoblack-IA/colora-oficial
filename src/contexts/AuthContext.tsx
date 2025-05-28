@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -16,6 +15,7 @@ interface UserProfile {
   verified_email?: boolean;
   last_login_at?: string;
   login_count?: number;
+  auth_provider?: 'google' | 'email' | 'facebook';
 }
 
 interface AuthContextType {
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Buscar perfil do usuário na tabela profiles com todos os novos campos
+  // Buscar perfil do usuário na tabela profiles com todos os campos incluindo auth_provider
   const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
     try {
       const { data, error } = await supabase
@@ -66,7 +66,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           locale,
           verified_email,
           last_login_at,
-          login_count
+          login_count,
+          auth_provider
         `)
         .eq('id', userId)
         .single();
@@ -88,7 +89,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         locale: data.locale,
         verified_email: data.verified_email,
         last_login_at: data.last_login_at,
-        login_count: data.login_count
+        login_count: data.login_count,
+        auth_provider: data.auth_provider
       };
     } catch (error) {
       console.error('Erro ao buscar perfil:', error);
