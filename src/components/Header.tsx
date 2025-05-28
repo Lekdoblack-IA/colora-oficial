@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { User, ChevronDown, LogOut, CreditCard, Coins } from "lucide-react";
+import { User, ChevronDown, LogOut, CreditCard, Coins, Home, LayoutDashboard } from "lucide-react";
 import { AuthModal } from './AuthModal';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 
@@ -50,6 +50,10 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
     navigate('/');
   };
 
+  const handleDashboard = () => {
+    navigate('/dashboard');
+  };
+
   return <>
       <header className="fixed top-0 left-0 right-0 z-50">
         {/* Header principal com glassmorphism */}
@@ -93,14 +97,27 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                 </Button>
               ) : (
                 <>
-                  {/* Botão Início */}
-                  <Button 
-                    onClick={handleInicio}
-                    variant="ghost" 
-                    className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hidden md:flex"
-                  >
-                    Início
-                  </Button>
+                  {/* Botão Início - apenas no desktop quando não está no dashboard */}
+                  {!isDashboard && (
+                    <Button 
+                      onClick={handleInicio}
+                      variant="ghost" 
+                      className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hidden md:flex"
+                    >
+                      Início
+                    </Button>
+                  )}
+                  
+                  {/* Botão Dashboard - apenas no desktop quando está na página inicial */}
+                  {!isDashboard && (
+                    <Button 
+                      onClick={handleDashboard}
+                      variant="ghost" 
+                      className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hidden md:flex"
+                    >
+                      Dashboard
+                    </Button>
+                  )}
                   
                   {/* Dropdown Minha Conta */}
                   <DropdownMenu>
@@ -121,9 +138,21 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleInicio} className="md:hidden">
-                        Início
-                      </DropdownMenuItem>
+                      
+                      {/* Mostrar "Voltar para o Inicio" se estiver no dashboard */}
+                      {isDashboard ? (
+                        <DropdownMenuItem onClick={handleInicio}>
+                          <Home className="mr-2 h-4 w-4" />
+                          Voltar para o Inicio
+                        </DropdownMenuItem>
+                      ) : (
+                        /* Mostrar "Ir para Dashboard" se estiver na página inicial */
+                        <DropdownMenuItem onClick={handleDashboard}>
+                          <LayoutDashboard className="mr-2 h-4 w-4" />
+                          Ir para Dashboard
+                        </DropdownMenuItem>
+                      )}
+                      
                       <DropdownMenuItem onClick={handleBuyCredits}>
                         <CreditCard className="mr-2 h-4 w-4" />
                         Comprar Créditos
