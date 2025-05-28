@@ -35,7 +35,7 @@ const PricingSection = () => {
   return <section className="py-20 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl font-bold mb-4 md:text-5xl">
             1 Crédito = 1 Desenho pra{' '}
             <span className="bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
               Colorir
