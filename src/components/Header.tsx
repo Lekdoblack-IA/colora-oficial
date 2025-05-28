@@ -1,15 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Heart, User, ChevronDown } from "lucide-react";
 import { AuthModal } from './AuthModal';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -19,23 +12,18 @@ const Header = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
   const handleLogout = () => {
     setIsLoggedIn(false);
     console.log('Logout realizado');
   };
-
   const handleLogin = () => {
     setIsLoggedIn(true);
     setIsAuthOpen(false);
   };
-
-  return (
-    <>
+  return <>
       <header className="fixed top-0 left-0 right-0 z-50">
         {/* Header principal com glassmorphism */}
         <div className="bg-white/80 backdrop-blur-md border-b border-white/20 px-4 py-4">
@@ -43,30 +31,18 @@ const Header = () => {
             {/* Logo */}
             <div className="flex items-center space-x-2">
               <Heart className="h-6 w-6 text-red-500 fill-current" />
-              <span className={`font-bold transition-all duration-300 ${
-                isScrolled ? 'text-lg' : 'text-2xl'
-              }`}>
+              <span className={`font-bold transition-all duration-300 ${isScrolled ? 'text-lg' : 'text-2xl'}`}>
                 {isScrolled ? 'Clr♡' : 'Colora ♡'}
               </span>
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:block">
-              {!isLoggedIn ? (
-                <Button 
-                  onClick={() => setIsAuthOpen(true)}
-                  variant="outline" 
-                  className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200"
-                >
+              {!isLoggedIn ? <Button onClick={() => setIsAuthOpen(true)} variant="outline" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200">
                   Entrar
-                </Button>
-              ) : (
-                <DropdownMenu>
+                </Button> : <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 flex items-center space-x-2"
-                    >
+                    <Button variant="outline" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 flex items-center space-x-2">
                       <User className="h-4 w-4" />
                       <span>Minha Conta</span>
                       <ChevronDown className="h-4 w-4" />
@@ -83,8 +59,7 @@ const Header = () => {
                       Sair
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu>
-              )}
+                </DropdownMenu>}
             </div>
 
             {/* Mobile - Logo centralizada (sem botões) */}
@@ -93,18 +68,12 @@ const Header = () => {
         </div>
         
         {/* Banner fixo abaixo do cabeçalho */}
-        <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 text-white text-center py-2 text-sm">
+        <div className="bg-gradient-to-r  via-pink-600 to-red-600 text-white text-center py-2 text-sm">
           ✨ Veja o resultado e só pague se amar
         </div>
       </header>
 
-      <AuthModal 
-        isOpen={isAuthOpen} 
-        onClose={() => setIsAuthOpen(false)}
-        onLogin={handleLogin}
-      />
-    </>
-  );
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onLogin={handleLogin} />
+    </>;
 };
-
 export default Header;
