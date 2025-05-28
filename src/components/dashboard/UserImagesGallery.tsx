@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Lock, Download, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { useToast } from '@/hooks/use-toast';
+
 interface UserImage {
   id: string;
   originalUrl: string;
@@ -99,25 +101,27 @@ export const UserImagesGallery = ({
         const isLocked = !image.isUnlocked && !expired;
         return <div key={image.id} className="relative group">
               <div className="relative overflow-hidden rounded-lg shadow-md">
-                <img src={image.transformedUrl} alt="Desenho transformado" className={`w-full h-48 md:h-64 object-cover transition-all duration-300 ${isLocked ? 'filter blur-[2px]' : ''}`} />
-                
-                {/* Overlay para imagens bloqueadas */}
-                {isLocked && <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-                    <div className="text-center text-white">
-                      <Lock className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2" />
-                      <p className="font-medium text-sm md:text-base">Bloqueada</p>
-                      <p className="text-xs md:text-sm opacity-90">Use créditos para liberar</p>
-                    </div>
-                  </div>}
+                <AspectRatio ratio={4/5}>
+                  <img src={image.transformedUrl} alt="Desenho transformado" className={`w-full h-full object-cover transition-all duration-300 ${isLocked ? 'filter blur-[2px]' : ''}`} />
+                  
+                  {/* Overlay para imagens bloqueadas */}
+                  {isLocked && <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                      <div className="text-center text-white">
+                        <Lock className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2" />
+                        <p className="font-medium text-sm md:text-base">Bloqueada</p>
+                        <p className="text-xs md:text-sm opacity-90">Use créditos para liberar</p>
+                      </div>
+                    </div>}
 
-                {/* Overlay para imagens expiradas */}
-                {expired && <div className="absolute inset-0 bg-red-500 bg-opacity-70 flex items-center justify-center">
-                    <div className="text-center text-white">
-                      <Clock className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2" />
-                      <p className="font-medium text-sm md:text-base">Expirada</p>
-                      <p className="text-xs md:text-sm opacity-90">Esta imagem não está mais disponível</p>
-                    </div>
-                  </div>}
+                  {/* Overlay para imagens expiradas */}
+                  {expired && <div className="absolute inset-0 bg-red-500 bg-opacity-70 flex items-center justify-center">
+                      <div className="text-center text-white">
+                        <Clock className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2" />
+                        <p className="font-medium text-sm md:text-base">Expirada</p>
+                        <p className="text-xs md:text-sm opacity-90">Esta imagem não está mais disponível</p>
+                      </div>
+                    </div>}
+                </AspectRatio>
               </div>
 
               {/* Informações da imagem */}
