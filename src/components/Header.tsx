@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
 import { User, ChevronDown, LogOut, CreditCard, Coins, Home, LayoutDashboard } from "lucide-react";
 import { AuthModal } from './AuthModal';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
@@ -54,6 +53,27 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
     navigate('/dashboard');
   };
 
+  // Estilos para botões customizados com transparência garantida
+  const buttonBaseStyle = {
+    padding: '8px 16px',
+    fontSize: '14px',
+    fontWeight: '500',
+    color: '#374151',
+    backgroundColor: 'transparent',
+    border: '1px solid #e5e7eb',
+    borderRadius: '6px',
+    backdropFilter: 'blur(4px)',
+    transition: 'all 0.2s ease-in-out',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
+  };
+
+  const buttonHoverStyle = {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)'
+  };
+
   return <>
       <header className="fixed top-0 left-0 right-0 z-50">
         {/* Header principal com glassmorphism */}
@@ -90,7 +110,13 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
               {!isLoggedIn ? (
                 <button 
                   onClick={() => setIsAuthOpen(true)} 
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-transparent border border-gray-200 rounded-md backdrop-blur-sm hover:bg-white/20 transition-colors"
+                  style={buttonBaseStyle}
+                  onMouseEnter={(e) => {
+                    Object.assign(e.target.style, buttonHoverStyle);
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'transparent';
+                  }}
                 >
                   Entrar
                 </button>
@@ -100,7 +126,17 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                   {!isDashboard && (
                     <button 
                       onClick={handleInicio}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-transparent border border-gray-200 rounded-md backdrop-blur-sm hover:bg-white/20 transition-colors hidden md:flex items-center"
+                      style={{
+                        ...buttonBaseStyle,
+                        display: window.innerWidth >= 768 ? 'flex' : 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        Object.assign(e.target.style, buttonHoverStyle);
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
+                      className="hidden md:flex"
                     >
                       Início
                     </button>
@@ -110,7 +146,17 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                   {!isDashboard && (
                     <button 
                       onClick={handleDashboard}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-transparent border border-gray-200 rounded-md backdrop-blur-sm hover:bg-white/20 transition-colors hidden md:flex items-center"
+                      style={{
+                        ...buttonBaseStyle,
+                        display: window.innerWidth >= 768 ? 'flex' : 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        Object.assign(e.target.style, buttonHoverStyle);
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
+                      className="hidden md:flex"
                     >
                       Dashboard
                     </button>
@@ -119,7 +165,15 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                   {/* Dropdown Minha Conta */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-transparent border border-gray-200 rounded-md backdrop-blur-sm hover:bg-white/20 transition-colors flex items-center space-x-2">
+                      <button 
+                        style={buttonBaseStyle}
+                        onMouseEnter={(e) => {
+                          Object.assign(e.target.style, buttonHoverStyle);
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = 'transparent';
+                        }}
+                      >
                         <User className="h-4 w-4" />
                         <span className="hidden md:inline">Minha Conta</span>
                         <ChevronDown className="h-4 w-4" />
