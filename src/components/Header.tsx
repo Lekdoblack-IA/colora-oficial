@@ -92,9 +92,17 @@ const Header = () => {
           </div>
         </div>
         
-        {/* Banner fixo abaixo do cabeçalho */}
-        <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 text-white text-center py-2 text-sm">
-          ✨ Veja o resultado e só pague se amar
+        {/* Banner fixo abaixo do cabeçalho com retração */}
+        <div className={`bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 text-white text-center transition-all duration-300 ease-in-out overflow-hidden ${
+          isScrolled 
+            ? 'h-[1px] py-0 text-transparent' 
+            : 'h-auto py-2'
+        }`}>
+          <span className={`text-sm transition-opacity duration-300 ${
+            isScrolled ? 'opacity-0' : 'opacity-100'
+          }`}>
+            ✨ Veja o resultado e só pague se amar
+          </span>
         </div>
       </header>
 
