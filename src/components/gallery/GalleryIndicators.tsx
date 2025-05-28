@@ -15,7 +15,7 @@ const GalleryIndicators = ({ totalImages, currentIndex, onIndicatorClick }: Gall
           className={`w-3 h-3 rounded-full transition-all duration-500 ${
             index === currentIndex
               ? 'bg-gradient-to-r from-pink-500 to-red-500 scale-125'
-              : 'bg-white/60 hover:bg-white/80'
+              : 'bg-gray-600/80 hover:bg-gray-700 md:bg-white/60 md:hover:bg-white/80 shadow-lg md:shadow-none'
           }`}
         />
       ))}

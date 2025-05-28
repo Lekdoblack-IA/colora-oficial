@@ -1,4 +1,3 @@
-
 interface GalleryImageProps {
   image: {
     id: number;
@@ -66,25 +65,34 @@ const GalleryImage = ({ image, position, isMobile, onClick }: GalleryImageProps)
     let transform = 'translateX(400px)';
     let opacity = 0;
     let zIndex = 0;
+    let filter = 'blur(0px)';
+    let scale = 1;
     
     if (isActive) {
       transform = 'translateX(0px)';
       opacity = 1;
       zIndex = 3;
+      filter = 'blur(0px)';
+      scale = 1;
     } else if (isPrev) {
-      transform = 'translateX(-300px) scale(0.8)';
-      opacity = 0.4;
+      transform = 'translateX(-180px) scale(0.75)';
+      opacity = 0.6;
       zIndex = 1;
+      filter = 'blur(2px)';
+      scale = 0.75;
     } else if (isNext) {
-      transform = 'translateX(300px) scale(0.8)';
-      opacity = 0.4;
+      transform = 'translateX(180px) scale(0.75)';
+      opacity = 0.6;
       zIndex = 1;
+      filter = 'blur(2px)';
+      scale = 0.75;
     }
     
     return {
       transform: `translate(-50%, -50%) ${transform}`,
       opacity,
       zIndex,
+      filter,
       transition: 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
     };
   };
@@ -95,7 +103,7 @@ const GalleryImage = ({ image, position, isMobile, onClick }: GalleryImageProps)
     : "absolute top-1/2 left-1/2 cursor-pointer";
   
   const imageClass = isMobile 
-    ? "w-72 h-96 rounded-3xl bg-white border border-black overflow-hidden shadow-xl"
+    ? "w-64 h-80 rounded-3xl bg-white border border-black overflow-hidden shadow-xl"
     : "w-80 h-96 rounded-3xl bg-white border border-black overflow-hidden shadow-2xl hover:shadow-3xl transition-shadow duration-300";
 
   const containerStyles = isMobile 

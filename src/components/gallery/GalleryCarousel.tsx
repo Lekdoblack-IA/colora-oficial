@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { galleryImages } from '@/data/galleryImages';
 import { useCarouselAutoplay } from '@/hooks/useCarouselAutoplay';
@@ -73,9 +72,9 @@ const GalleryCarousel = () => {
         })}
       </div>
 
-      {/* Mobile: Touch-enabled Carousel */}
+      {/* Mobile: Touch-enabled Carousel with Peek Effect */}
       <div 
-        className="md:hidden relative w-full h-full flex items-center justify-center touch-pan-y"
+        className="md:hidden relative w-full h-full flex items-center justify-center touch-pan-y px-8"
         {...touchHandlers}
         {...mouseHandlers}
         style={{ userSelect: 'none' }}
