@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
@@ -136,7 +135,7 @@ const ScratchCard = () => {
   return (
     <div className="w-full max-w-sm mx-auto">
       <AspectRatio ratio={4/5}>
-        <div className="relative w-full h-full rounded-3xl overflow-hidden border border-gray-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:border-transparent hover:-translate-y-1">
+        <div className="relative w-full h-full rounded-3xl overflow-hidden border border-gray-200 bg-white shadow-xl hover:shadow-2xl transition-all duration-500 hover:border-transparent hover:-translate-y-3 hover:shadow-pink-500/20 transform hover:scale-[1.02] animate-float">
           {/* Imagem de baixo - desenho para colorir */}
           <div 
             className="absolute inset-0 bg-white bg-cover bg-center"
