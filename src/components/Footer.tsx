@@ -1,28 +1,21 @@
-
 import { Heart } from 'lucide-react';
-
 const Footer = () => {
-  return (
-    <footer className="bg-gray-900 text-white py-12">
+  return <footer className="bg-gray-900 text-white py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo e Descrição */}
           <div className="md:col-span-2">
             <div className="flex items-center mb-4">
-              <img 
-                src="/lovable-uploads/ee0393c6-5834-4e27-b4e2-7731aac513e6.png" 
-                alt="Colora♡" 
-                className="h-8" 
-              />
+              <img src="/lovable-uploads/ee0393c6-5834-4e27-b4e2-7731aac513e6.png" alt="Colora♡" className="h-8" />
             </div>
             <p className="text-gray-400 mb-4 max-w-md">
               Transforme suas memórias mais especiais em desenhos únicos para colorir. 
               Eternize momentos afetivos de forma criativa e interativa.
             </p>
             <div className="flex items-center text-sm text-gray-500">
-              <span>Feito com</span>
+              <span>Feito com para eternizar memórias</span>
               <Heart className="w-4 h-4 mx-1 text-pink-500" />
-              <span>para eternizar memórias</span>
+              
             </div>
           </div>
 
@@ -101,8 +94,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
