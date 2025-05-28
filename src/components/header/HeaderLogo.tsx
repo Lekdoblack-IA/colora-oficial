@@ -38,13 +38,13 @@ export const HeaderLogo = ({ isDashboard, isLoggedIn, userCredits }: HeaderLogoP
       {isScrolled ? 
         <img 
           alt="Clr♡" 
-          className="h-8 transition-all duration-300" 
+          className="h-6 md:h-8 transition-all duration-300" 
           src="/lovable-uploads/0d4e9f12-e51b-41e2-b9cd-9910f8f3e9ee.png" 
         /> : 
         <img 
           src="/lovable-uploads/ee0393c6-5834-4e27-b4e2-7731aac513e6.png" 
           alt="Colora♡" 
-          className="h-10 md:h-10 transition-all duration-300" 
+          className="h-8 md:h-10 transition-all duration-300" 
         />
       }
     </div>
