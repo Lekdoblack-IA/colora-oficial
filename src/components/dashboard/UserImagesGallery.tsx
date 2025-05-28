@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Lock, Download, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
+
 interface UserImage {
   id: string;
   originalUrl: string;
@@ -16,6 +18,7 @@ interface UserImagesGalleryProps {
   onUnlockImage: (imageId: string) => void;
   isImageExpired: (image: UserImage) => boolean;
 }
+
 const TimeLeft = ({
   expiresAt
 }: {
@@ -43,6 +46,7 @@ const TimeLeft = ({
       <span>Expira em {timeLeft}</span>
     </div>;
 };
+
 export const UserImagesGallery = ({
   images,
   onUnlockImage,
@@ -51,6 +55,7 @@ export const UserImagesGallery = ({
   const {
     toast
   } = useToast();
+
   const handleDownload = (imageUrl: string, imageId: string) => {
     // Simular download
     const link = document.createElement('a');
@@ -64,12 +69,22 @@ export const UserImagesGallery = ({
       description: "Sua imagem está sendo baixada."
     });
   };
+
   if (images.length === 0) {
     return <section className="bg-white rounded-2xl p-4 md:p-8 shadow-sm">
         <div className="text-center">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
-            Suas Imagens
-          </h2>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 cursor-help">
+                  Suas Imagens
+                </h2>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Gaste 1 Crédito para Desbloquear imagem pra Download</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <div className="py-8 md:py-12">
             <div className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
               <Download className="w-6 h-6 md:w-8 md:h-8 text-gray-400" />
@@ -84,11 +99,21 @@ export const UserImagesGallery = ({
         </div>
       </section>;
   }
+
   return <section className="bg-white rounded-2xl p-4 md:p-8 shadow-sm">
       <div className="text-center mb-6 md:mb-8">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
-          Suas Imagens
-        </h2>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 cursor-help">
+                Suas Imagens
+              </h2>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Gaste 1 Crédito para Desbloquear imagem pra Download</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <p className="text-sm md:text-base text-gray-600">
           {images.length} {images.length === 1 ? 'imagem transformada' : 'imagens transformadas'}
         </p>
