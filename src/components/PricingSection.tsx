@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const packages = [{
   id: 'mini',
@@ -20,7 +20,7 @@ const packages = [{
   totalPrice: 48,
   description: 'Ideal para criar uma sequência de memórias — como uma linha do tempo ou mural de fotos',
   note: 'Economize 40% comprando pacote "Max"',
-  isPopular: false
+  isPopular: true
 }, {
   id: 'max',
   name: 'Pacote Max',
@@ -29,11 +29,13 @@ const packages = [{
   totalPrice: 72,
   description: 'A escolha perfeita para montar um álbum completo, livro personalizado ou caixa de memórias',
   note: 'Melhor custo benefício!',
-  isPopular: true
+  isPopular: false
 }];
 
 const PricingSection = () => {
   const [selectedPackage, setSelectedPackage] = useState('plus');
+  
+  const selectedPkg = packages.find(pkg => pkg.id === selectedPackage);
   
   return (
     <section className="py-20 px-4 bg-gray-50">
@@ -50,83 +52,76 @@ const PricingSection = () => {
           </p>
         </div>
 
-        {/* Toggle de pacotes */}
-        <div className="flex justify-center mb-12">
-          <div className="inline-flex rounded-full bg-white p-1 shadow-lg border">
-            {packages.map(pkg => (
-              <button
-                key={pkg.id}
-                onClick={() => setSelectedPackage(pkg.id)}
-                className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
-                  selectedPackage === pkg.id
-                    ? 'bg-gradient-to-r from-pink-500 to-red-500 text-white shadow-lg'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {pkg.name.split(' ')[1]}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Card do pacote selecionado */}
+        {/* Card único com design da referência */}
         <div className="max-w-sm mx-auto">
-          {packages.map(pkg => {
-            if (pkg.id !== selectedPackage) return null;
-            
-            return (
-              <div
-                key={pkg.id}
-                className="bg-white rounded-3xl shadow-xl overflow-hidden"
-              >
-                {/* Header com gradiente e quantidade de créditos */}
-                <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white text-center py-4">
-                  <h3 className="text-xl font-semibold">
-                    {pkg.credits} {pkg.credits === 1 ? 'Crédito' : 'Créditos'}
-                  </h3>
-                </div>
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+            {/* Header com gradiente e quantidade de créditos */}
+            <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white text-center py-4">
+              <h3 className="text-lg font-medium">
+                {selectedPkg?.credits} {selectedPkg?.credits === 1 ? 'Desenho' : 'Desenhos'}
+              </h3>
+            </div>
 
-                {/* Conteúdo do card */}
-                <div className="p-8 text-center">
-                  {/* Nome do pacote */}
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                    {pkg.name}
-                  </h2>
+            {/* Conteúdo do card */}
+            <div className="p-8 text-center">
+              {/* Nome do pacote */}
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                {selectedPkg?.name}
+              </h2>
 
-                  {/* Descrição */}
-                  <p className="text-gray-600 mb-8 leading-relaxed">
-                    {pkg.description}
-                  </p>
+              {/* Descrição */}
+              <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+                {selectedPkg?.description}
+              </p>
 
-                  {/* Preço */}
-                  <div className="mb-2">
-                    <span className="text-5xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
-                      R$ {pkg.totalPrice}
-                    </span>
-                  </div>
-
-                  {/* Preço por crédito */}
-                  <p className="text-pink-500 text-lg font-medium mb-8">
-                    Apenas {pkg.pricePerCredit} Reais por imagem!
-                  </p>
-
-                  {/* Botão CTA */}
-                  <Button className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white py-4 rounded-full text-lg font-semibold mb-4 h-auto">
-                    Transforme sua foto antes de Pagar
-                  </Button>
-
-                  {/* Nota */}
-                  {pkg.note && (
-                    <p className={`text-sm ${
-                      pkg.isPopular ? 'text-green-600 font-medium' : 'text-gray-500'
-                    }`}>
-                      {pkg.note}
-                    </p>
-                  )}
-                </div>
+              {/* Toggle de pacotes dentro do card */}
+              <div className="mb-6">
+                <ToggleGroup 
+                  type="single" 
+                  value={selectedPackage} 
+                  onValueChange={(value) => value && setSelectedPackage(value)}
+                  className="inline-flex rounded-full bg-gray-100 p-1"
+                >
+                  {packages.map(pkg => (
+                    <ToggleGroupItem
+                      key={pkg.id}
+                      value={pkg.id}
+                      className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-pink-500 data-[state=on]:to-red-500 data-[state=on]:text-white data-[state=on]:shadow-md text-gray-600 hover:text-gray-900"
+                    >
+                      {pkg.name.split(' ')[1]}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
               </div>
-            );
-          })}
+
+              {/* Preço */}
+              <div className="mb-2">
+                <span className="text-pink-500 text-xl font-medium mr-1">R$</span>
+                <span className="text-5xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+                  {selectedPkg?.totalPrice}
+                </span>
+              </div>
+
+              {/* Preço por crédito */}
+              <p className="text-pink-500 text-base font-medium mb-8">
+                Apenas {selectedPkg?.pricePerCredit} Reais por imagem!
+              </p>
+
+              {/* Botão CTA */}
+              <Button className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white py-4 rounded-full text-base font-semibold mb-4 h-auto">
+                Transforme sua foto antes de Pagar
+              </Button>
+
+              {/* Nota */}
+              {selectedPkg?.note && (
+                <p className={`text-sm ${
+                  selectedPkg.isPopular ? 'text-green-600 font-medium' : 'text-gray-500'
+                }`}>
+                  {selectedPkg.note}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </section>
