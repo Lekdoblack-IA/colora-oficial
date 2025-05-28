@@ -96,9 +96,9 @@ export const BuyCreditsModal = ({
   );
 
   const MobileModalHeader = () => (
-    <>
+    <div className="bg-black text-white relative">
       {/* Credits Counter Header */}
-      <div className="bg-black text-white text-center py-3 px-6">
+      <div className="text-center py-3 px-6">
         <span className="text-sm font-medium">
           Você tem: <span className="font-bold">{currentCredits} Créditos</span> disponíveis
         </span>
@@ -109,11 +109,11 @@ export const BuyCreditsModal = ({
         variant="ghost"
         size="icon"
         onClick={onClose}
-        className="absolute right-4 top-16 z-10 rounded-full hover:bg-gray-100"
+        className="absolute right-4 top-3 z-10 rounded-full hover:bg-gray-800 text-white hover:text-white"
       >
-        <X className="w-5 h-5 text-gray-500" />
+        <X className="w-5 h-5" />
       </Button>
-    </>
+    </div>
   );
 
   const DesktopModalContent = () => (
@@ -163,7 +163,7 @@ export const BuyCreditsModal = ({
 
   const MobileModalContent = () => (
     <div className="bg-white h-full flex flex-col overflow-hidden">
-      {/* Fixed Header */}
+      {/* Fixed Header - Now completely black */}
       <div className="flex-shrink-0">
         <MobileModalHeader />
       </div>
