@@ -1,6 +1,4 @@
-
 import { Star, Heart } from 'lucide-react';
-
 const testimonials = [{
   id: 1,
   name: "Maria Silva",
@@ -26,7 +24,6 @@ const testimonials = [{
   rating: 5,
   image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face"
 }];
-
 const TestimonialsSection = () => {
   return <section className="px-4 py-[40px]">
       <div className="max-w-7xl mx-auto">
@@ -72,7 +69,7 @@ const TestimonialsSection = () => {
                     <span>{testimonial.name}</span>
                   </div>
                   <div className="text-gray-500 text-sm">{testimonial.state}</div>
-                  <div className="text-gray-500 text-sm">{testimonial.relationship}</div>
+                  
                 </div>
               </div>
             </div>)}
@@ -80,5 +77,4 @@ const TestimonialsSection = () => {
       </div>
     </section>;
 };
-
 export default TestimonialsSection;
