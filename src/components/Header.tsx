@@ -2,11 +2,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { User, ChevronDown, LogOut, CreditCard } from "lucide-react";
+import { User, ChevronDown, LogOut, CreditCard, Coins } from "lucide-react";
 import { AuthModal } from './AuthModal';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 
-const Header = () => {
+interface HeaderProps {
+  userCredits?: number;
+}
+
+const Header = ({ userCredits = 5 }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true); // Simulando usuário logado no dashboard
@@ -51,21 +55,31 @@ const Header = () => {
         {/* Header principal com glassmorphism */}
         <div className="bg-white/80 backdrop-blur-md border-b border-white/20 px-4 py-[25px]">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            {/* Logo - Desktop e Mobile */}
-            <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
-              {isScrolled ? 
-                <img 
-                  alt="Clr♡" 
-                  className="h-8 transition-all duration-300" 
-                  src="/lovable-uploads/0d4e9f12-e51b-41e2-b9cd-9910f8f3e9ee.png" 
-                /> : 
-                <img 
-                  src="/lovable-uploads/ee0393c6-5834-4e27-b4e2-7731aac513e6.png" 
-                  alt="Colora♡" 
-                  className="h-10 md:h-10 transition-all duration-300" 
-                />
-              }
-            </div>
+            {/* Logo ou Contador de Créditos */}
+            {isDashboard && isLoggedIn ? (
+              <div className="flex items-center space-x-3 bg-gradient-to-r from-pink-500 to-red-500 rounded-lg px-4 py-2 text-white">
+                <Coins className="w-5 h-5" />
+                <div className="text-center">
+                  <p className="text-xs opacity-90">Seus Créditos</p>
+                  <p className="text-lg font-bold">{userCredits}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
+                {isScrolled ? 
+                  <img 
+                    alt="Clr♡" 
+                    className="h-8 transition-all duration-300" 
+                    src="/lovable-uploads/0d4e9f12-e51b-41e2-b9cd-9910f8f3e9ee.png" 
+                  /> : 
+                  <img 
+                    src="/lovable-uploads/ee0393c6-5834-4e27-b4e2-7731aac513e6.png" 
+                    alt="Colora♡" 
+                    className="h-10 md:h-10 transition-all duration-300" 
+                  />
+                }
+              </div>
+            )}
 
             {/* Navigation - Desktop e Mobile */}
             <div className="flex items-center space-x-4">

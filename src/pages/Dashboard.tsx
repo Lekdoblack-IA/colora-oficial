@@ -108,8 +108,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header: Logo, "Inicio","Minha Conta (Dropdown)" */}
-      <Header />
+      {/* Header: Logo/Contador de Créditos, "Inicio","Minha Conta (Dropdown)" */}
+      <Header userCredits={userCredits} />
       
       <main className="pt-24 flex-1">
         <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
