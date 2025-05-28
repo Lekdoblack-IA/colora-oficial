@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -80,8 +81,8 @@ export const BuyCreditsModal = ({
         </span>
       </div>
 
-      {/* Tooltip and Close Button */}
-      <div className="absolute right-4 top-16 z-10 flex items-center space-x-2">
+      {/* Tooltip in top left */}
+      <div className="absolute left-4 top-16 z-10">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -92,16 +93,17 @@ export const BuyCreditsModal = ({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="rounded-full hover:bg-gray-100"
-        >
-          <X className="w-5 h-5 text-gray-500" />
-        </Button>
       </div>
+
+      {/* Close Button in top right */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onClose}
+        className="absolute right-4 top-16 z-10 rounded-full hover:bg-gray-100"
+      >
+        <X className="w-5 h-5 text-gray-500" />
+      </Button>
 
       <div className="p-8">
         {/* Header */}
