@@ -1,7 +1,7 @@
 
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
 import { User, ChevronDown, LogOut, CreditCard, Coins, Home, LayoutDashboard } from "lucide-react";
 import { AuthModal } from './AuthModal';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
@@ -54,27 +54,6 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
     navigate('/dashboard');
   };
 
-  // Estilos para botões customizados com transparência garantida
-  const buttonBaseStyle = {
-    padding: '8px 16px',
-    fontSize: '14px',
-    fontWeight: '500',
-    color: '#374151',
-    backgroundColor: 'transparent',
-    border: '1px solid #e5e7eb',
-    borderRadius: '6px',
-    backdropFilter: 'blur(4px)',
-    transition: 'all 0.2s ease-in-out',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
-  };
-
-  const buttonHoverStyle = {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)'
-  };
-
   return <>
       <header className="fixed top-0 left-0 right-0 z-50">
         {/* Header principal com glassmorphism */}
@@ -109,76 +88,45 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
             {/* Navigation - Desktop e Mobile */}
             <div className="flex items-center space-x-4">
               {!isLoggedIn ? (
-                <button 
+                <Button 
                   onClick={() => setIsAuthOpen(true)} 
-                  style={buttonBaseStyle}
-                  onMouseEnter={(e) => {
-                    Object.assign((e.target as HTMLButtonElement).style, buttonHoverStyle);
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.target as HTMLButtonElement).style.backgroundColor = 'transparent';
-                  }}
+                  variant="outline" 
+                  className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200"
                 >
                   Entrar
-                </button>
+                </Button>
               ) : (
                 <>
                   {/* Botão Início - apenas no desktop quando não está no dashboard */}
                   {!isDashboard && (
-                    <button 
+                    <Button 
                       onClick={handleInicio}
-                      style={{
-                        ...buttonBaseStyle,
-                        display: window.innerWidth >= 768 ? 'flex' : 'none'
-                      }}
-                      onMouseEnter={(e) => {
-                        Object.assign((e.target as HTMLButtonElement).style, buttonHoverStyle);
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.target as HTMLButtonElement).style.backgroundColor = 'transparent';
-                      }}
-                      className="hidden md:flex"
+                      variant="ghost" 
+                      className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hidden md:flex"
                     >
                       Início
-                    </button>
+                    </Button>
                   )}
                   
                   {/* Botão Dashboard - apenas no desktop quando está na página inicial */}
                   {!isDashboard && (
-                    <button 
+                    <Button 
                       onClick={handleDashboard}
-                      style={{
-                        ...buttonBaseStyle,
-                        display: window.innerWidth >= 768 ? 'flex' : 'none'
-                      }}
-                      onMouseEnter={(e) => {
-                        Object.assign((e.target as HTMLButtonElement).style, buttonHoverStyle);
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.target as HTMLButtonElement).style.backgroundColor = 'transparent';
-                      }}
-                      className="hidden md:flex"
+                      variant="ghost" 
+                      className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hidden md:flex"
                     >
                       Dashboard
-                    </button>
+                    </Button>
                   )}
                   
                   {/* Dropdown Minha Conta */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button 
-                        style={buttonBaseStyle}
-                        onMouseEnter={(e) => {
-                          Object.assign((e.target as HTMLButtonElement).style, buttonHoverStyle);
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.target as HTMLButtonElement).style.backgroundColor = 'transparent';
-                        }}
-                      >
+                      <Button variant="outline" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 flex items-center space-x-2">
                         <User className="h-4 w-4" />
                         <span className="hidden md:inline">Minha Conta</span>
                         <ChevronDown className="h-4 w-4" />
-                      </button>
+                      </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg">
                       <DropdownMenuLabel className="font-normal">
@@ -239,4 +187,3 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
 };
 
 export default Header;
-
