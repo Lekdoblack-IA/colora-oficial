@@ -51,7 +51,7 @@ export const AuthModal = ({
   return <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md border-0 bg-white rounded-3xl shadow-2xl overflow-hidden p-0">
         {/* Header com gradiente */}
-        <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 p-6 text-white text-center">
+        <div className="bg-gradient-to-r from-purple-100 via-pink-100 to-red-100 p-6 text-white text-center">
           <div className="flex items-center justify-center space-x-2 mb-2">
             <img src="/lovable-uploads/994f886c-18af-4dbc-8bca-2ad90885a150.png" alt="Colora ♡" className="h-8 w-auto brightness-0 invert" />
           </div>
