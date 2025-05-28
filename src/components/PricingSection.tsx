@@ -2,8 +2,6 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, HelpCircle } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const packages = [{
   id: 'mini',
@@ -72,90 +70,60 @@ const PricingSection = () => {
         </div>
 
         {/* Card do pacote selecionado */}
-        <div className="max-w-md mx-auto">
+        <div className="max-w-sm mx-auto">
           {packages.map(pkg => {
             if (pkg.id !== selectedPackage) return null;
             
             return (
               <div
                 key={pkg.id}
-                className="relative bg-white rounded-3xl border border-gray-200 p-8 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="bg-white rounded-3xl shadow-xl overflow-hidden"
               >
-                {pkg.isPopular && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pink-500 to-red-500 text-white px-4 py-1.5 text-sm font-medium">
-                    Melhor custo benefício!
-                  </Badge>
-                )}
-
-                {/* 1. Nome do pacote */}
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900">{pkg.name}</h3>
+                {/* Header com gradiente e quantidade de créditos */}
+                <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white text-center py-4">
+                  <h3 className="text-xl font-semibold">
+                    {pkg.credits} {pkg.credits === 1 ? 'Crédito' : 'Créditos'}
+                  </h3>
                 </div>
 
-                {/* 2. Descrição */}
-                <div className="text-center mb-8">
-                  <p className="text-gray-600 leading-relaxed text-base">
+                {/* Conteúdo do card */}
+                <div className="p-8 text-center">
+                  {/* Nome do pacote */}
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                    {pkg.name}
+                  </h2>
+
+                  {/* Descrição */}
+                  <p className="text-gray-600 mb-8 leading-relaxed">
                     {pkg.description}
                   </p>
-                </div>
 
-                {/* 3. Preço Total / Preço por imagem - DESTACADO */}
-                <div className="text-center mb-6 bg-gradient-to-br from-pink-50 to-red-50 rounded-2xl p-6 border border-pink-100">
-                  <div className="mb-3">
-                    <div className="text-4xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent mb-3">
-                      R$ {pkg.totalPrice.toFixed(2)}
-                    </div>
-                    <div className="flex items-center justify-center space-x-2">
-                      <span className="text-2xl font-bold text-pink-600">R${pkg.pricePerCredit}</span>
-                      <span className="text-gray-600 text-lg">por imagem</span>
-                      {pkg.pricePerCredit < 5 && (
-                        <span className="text-gray-400 line-through text-base">R$5</span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Quantidade de Créditos no Pacote - Movido para baixo do preço */}
-                  <div className="pt-3 border-t border-pink-200">
-                    <span className="text-lg font-semibold text-gray-700">
-                      {pkg.credits} Crédito{pkg.credits > 1 ? 's' : ''}
+                  {/* Preço */}
+                  <div className="mb-2">
+                    <span className="text-5xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+                      R$ {pkg.totalPrice}
                     </span>
                   </div>
-                </div>
 
-                {/* 4. Nota discreta - Próxima do botão CTA */}
-                {pkg.note && (
-                  <div className="text-center mb-4">
+                  {/* Preço por crédito */}
+                  <p className="text-pink-500 text-lg font-medium mb-8">
+                    Apenas {pkg.pricePerCredit} Reais por imagem!
+                  </p>
+
+                  {/* Botão CTA */}
+                  <Button className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white py-4 rounded-full text-lg font-semibold mb-4 h-auto">
+                    Transforme sua foto antes de Pagar
+                  </Button>
+
+                  {/* Nota */}
+                  {pkg.note && (
                     <p className={`text-sm ${
                       pkg.isPopular ? 'text-green-600 font-medium' : 'text-gray-500'
                     }`}>
                       {pkg.note}
                     </p>
-                  </div>
-                )}
-
-                {/* 5. Botão CTA */}
-                <Button className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white py-4 rounded-full text-lg font-semibold mb-6 h-auto">
-                  Transforme sua foto antes de Pagar
-                </Button>
-
-                {/* 6. Tooltip */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center justify-center space-x-2 text-sm text-gray-500 cursor-help hover:text-gray-700 transition-colors">
-                        <HelpCircle className="w-4 h-4" />
-                        <span>Por que escolher nosso serviço?</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs text-center">
-                        Utilizamos a GPT-image-1, a melhor IA geradora de imagens da atualidade
-                        <br />
-                        (economia de R$115/mês do GPT Plus)
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                  )}
+                </div>
               </div>
             );
           })}
