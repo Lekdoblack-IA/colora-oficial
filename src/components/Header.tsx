@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { User, ChevronDown } from "lucide-react";
@@ -40,8 +41,8 @@ const Header = () => {
         {/* Header principal com glassmorphism */}
         <div className="bg-white/80 backdrop-blur-md border-b border-white/20 px-4 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center">
+            {/* Logo - Desktop */}
+            <div className="hidden md:flex items-center">
               {isScrolled ? (
                 <img 
                   src="/lovable-uploads/4b9d0e21-429d-4ec8-a995-7dc39afd21d8.png" 
@@ -52,7 +53,24 @@ const Header = () => {
                 <img 
                   src="/lovable-uploads/a87e684d-fed7-4b3a-88ff-3c24e99d5962.png" 
                   alt="Colora♡" 
-                  className="h-12 transition-all duration-300"
+                  className="h-10 transition-all duration-300"
+                />
+              )}
+            </div>
+
+            {/* Logo - Mobile (centralizada) */}
+            <div className="md:hidden absolute left-1/2 transform -translate-x-1/2">
+              {isScrolled ? (
+                <img 
+                  src="/lovable-uploads/4b9d0e21-429d-4ec8-a995-7dc39afd21d8.png" 
+                  alt="Clr♡" 
+                  className="h-6 transition-all duration-300"
+                />
+              ) : (
+                <img 
+                  src="/lovable-uploads/a87e684d-fed7-4b3a-88ff-3c24e99d5962.png" 
+                  alt="Colora♡" 
+                  className="h-8 transition-all duration-300"
                 />
               )}
             </div>
@@ -94,8 +112,8 @@ const Header = () => {
               )}
             </div>
 
-            {/* Mobile - Logo centralizada (sem botões) */}
-            <div className="md:hidden" />
+            {/* Mobile - Espaço vazio para balancear o layout */}
+            <div className="md:hidden w-8" />
           </div>
         </div>
         
@@ -119,3 +137,4 @@ const Header = () => {
 };
 
 export default Header;
+
