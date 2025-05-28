@@ -8,24 +8,30 @@ import PricingSection from '@/components/PricingSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import FAQSection from '@/components/FAQSection';
 import Footer from '@/components/Footer';
-import { AuthModal } from '@/components/AuthModal';
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
 
   const handleLogin = () => {
     setIsLoggedIn(true);
-    setIsAuthOpen(false);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
   };
 
   const handleAuthModalOpen = () => {
-    setIsAuthOpen(true);
+    // This function can be used for additional logic when opening the auth modal from other components
+    console.log('Auth modal opened');
   };
 
   return (
     <div className="min-h-screen">
-      <Header />
+      <Header 
+        isLoggedIn={isLoggedIn}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+      />
       <HeroSection isLoggedIn={isLoggedIn} onAuthModalOpen={handleAuthModalOpen} />
       <GallerySection />
       <HowItWorksSection />
@@ -33,12 +39,6 @@ const Index = () => {
       <TestimonialsSection />
       <FAQSection />
       <Footer />
-      
-      <AuthModal 
-        isOpen={isAuthOpen} 
-        onClose={() => setIsAuthOpen(false)} 
-        onLogin={handleLogin} 
-      />
     </div>
   );
 };

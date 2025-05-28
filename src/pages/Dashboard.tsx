@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -19,22 +18,28 @@ interface UserImage {
 }
 
 const Dashboard = () => {
-  const [userCredits, setUserCredits] = useState(5); // Mock inicial
+  const [userCredits, setUserCredits] = useState(5);
   const [userImages, setUserImages] = useState<UserImage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showBuyCreditsModal, setShowBuyCreditsModal] = useState(false);
   const [selectedImageToUnlock, setSelectedImageToUnlock] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Simular verificação de login
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   useEffect(() => {
     if (!isLoggedIn) {
       navigate('/');
     }
   }, [isLoggedIn, navigate]);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
 
   const handleImageTransformed = (originalUrl: string, transformedUrl: string) => {
     const newImage: UserImage = {
@@ -107,7 +112,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header userCredits={userCredits} onCreditsAdded={handleCreditsAdded} />
+      <Header 
+        userCredits={userCredits} 
+        onCreditsAdded={handleCreditsAdded}
+        isLoggedIn={isLoggedIn}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+      />
       
       <main className="pt-24 md:pt-32 flex-1">
         <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-8 space-y-6 md:space-y-12">

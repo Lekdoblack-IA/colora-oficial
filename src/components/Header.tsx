@@ -12,26 +12,24 @@ interface HeaderProps {
   onCreditsAdded?: (credits: number) => void;
   isLoggedIn?: boolean;
   onLogin?: () => void;
-  onAuthModalOpen?: () => void;
+  onLogout?: () => void;
 }
 
 const Header = ({ 
   userCredits = 5, 
   onCreditsAdded, 
-  isLoggedIn: propIsLoggedIn,
+  isLoggedIn = false,
   onLogin,
-  onAuthModalOpen 
+  onLogout
 }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isBuyCreditsOpen, setIsBuyCreditsOpen] = useState(false);
-  const [internalIsLoggedIn, setInternalIsLoggedIn] = useState(true);
   const [userEmail] = useState("usuario@exemplo.com");
   const navigate = useNavigate();
   const location = useLocation();
 
   const isDashboard = location.pathname === '/dashboard';
-  const isLoggedIn = propIsLoggedIn !== undefined ? propIsLoggedIn : internalIsLoggedIn;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,35 +40,24 @@ const Header = ({
   }, []);
 
   const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+    }
     if (isDashboard) {
-      setInternalIsLoggedIn(false);
       navigate('/');
-    } else {
-      // Reset login state for home page
-      if (propIsLoggedIn === undefined) {
-        setInternalIsLoggedIn(false);
-      }
     }
     console.log('Logout realizado');
   };
 
   const handleLogin = () => {
-    if (isDashboard) {
-      setInternalIsLoggedIn(true);
-      setIsAuthOpen(false);
-      navigate('/dashboard');
-    } else {
-      onLogin?.();
-      setIsAuthOpen(false);
+    setIsAuthOpen(false);
+    if (onLogin) {
+      onLogin();
     }
   };
 
   const handleOpenAuthModal = () => {
-    if (onAuthModalOpen && !isDashboard) {
-      onAuthModalOpen();
-    } else {
-      setIsAuthOpen(true);
-    }
+    setIsAuthOpen(true);
   };
 
   const handleBuyCredits = () => {
@@ -194,10 +181,11 @@ const Header = ({
         )}
       </header>
 
-      {/* Modal de autenticação apenas para dashboard */}
-      {isDashboard && (
-        <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onLogin={handleLogin} />
-      )}
+      <AuthModal 
+        isOpen={isAuthOpen} 
+        onClose={() => setIsAuthOpen(false)} 
+        onLogin={handleLogin} 
+      />
       
       <BuyCreditsModal 
         isOpen={isBuyCreditsOpen}
