@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { User, ChevronDown, LogOut, CreditCard, Coins, Home, LayoutDashboard } from "lucide-react";
@@ -112,10 +113,10 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                   onClick={() => setIsAuthOpen(true)} 
                   style={buttonBaseStyle}
                   onMouseEnter={(e) => {
-                    Object.assign(e.target.style, buttonHoverStyle);
+                    Object.assign((e.target as HTMLButtonElement).style, buttonHoverStyle);
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'transparent';
+                    (e.target as HTMLButtonElement).style.backgroundColor = 'transparent';
                   }}
                 >
                   Entrar
@@ -131,10 +132,10 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                         display: window.innerWidth >= 768 ? 'flex' : 'none'
                       }}
                       onMouseEnter={(e) => {
-                        Object.assign(e.target.style, buttonHoverStyle);
+                        Object.assign((e.target as HTMLButtonElement).style, buttonHoverStyle);
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
+                        (e.target as HTMLButtonElement).style.backgroundColor = 'transparent';
                       }}
                       className="hidden md:flex"
                     >
@@ -151,10 +152,10 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                         display: window.innerWidth >= 768 ? 'flex' : 'none'
                       }}
                       onMouseEnter={(e) => {
-                        Object.assign(e.target.style, buttonHoverStyle);
+                        Object.assign((e.target as HTMLButtonElement).style, buttonHoverStyle);
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
+                        (e.target as HTMLButtonElement).style.backgroundColor = 'transparent';
                       }}
                       className="hidden md:flex"
                     >
@@ -168,10 +169,10 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                       <button 
                         style={buttonBaseStyle}
                         onMouseEnter={(e) => {
-                          Object.assign(e.target.style, buttonHoverStyle);
+                          Object.assign((e.target as HTMLButtonElement).style, buttonHoverStyle);
                         }}
                         onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = 'transparent';
+                          (e.target as HTMLButtonElement).style.backgroundColor = 'transparent';
                         }}
                       >
                         <User className="h-4 w-4" />
@@ -238,3 +239,4 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
 };
 
 export default Header;
+
