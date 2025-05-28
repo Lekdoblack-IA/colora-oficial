@@ -13,7 +13,7 @@ const Footer = () => {
               Eternize momentos afetivos de forma criativa e interativa.
             </p>
             <div className="flex items-center text-sm text-gray-500">
-              <span>Feito com para eternizar memórias</span>
+              <span>Transformando memórias em experiência.</span>
               <Heart className="w-4 h-4 mx-1 text-pink-500" />
               
             </div>
