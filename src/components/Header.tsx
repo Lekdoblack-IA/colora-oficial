@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { User, ChevronDown, LogOut, CreditCard } from "lucide-react";
 import { AuthModal } from './AuthModal';
@@ -12,6 +12,10 @@ const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true); // Simulando usuário logado no dashboard
   const [userEmail] = useState("usuario@exemplo.com"); // Mock do email do usuário
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Verificar se está na página do dashboard
+  const isDashboard = location.pathname === '/dashboard';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -123,14 +127,16 @@ const Header = () => {
           </div>
         </div>
         
-        {/* Banner fixo abaixo do cabeçalho com retração ao rolar */}
-        <div className={`bg-gradient-to-r from-purple-600/80 via-pink-600/80 to-red-600/80 backdrop-blur-sm text-white text-center text-sm transition-all duration-300 overflow-hidden ${isScrolled ? 'h-0 py-0' : 'h-auto py-2'}`}>
-          <div className={`transition-opacity duration-300 ${isScrolled ? 'opacity-0' : 'opacity-100'}`}>
-            <span className="animate-pulse-heart bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text font-medium text-slate-50">
-              Veja o resultado e só pague se amar
-            </span>
+        {/* Banner fixo abaixo do cabeçalho - não exibir no dashboard */}
+        {!isDashboard && (
+          <div className={`bg-gradient-to-r from-purple-600/80 via-pink-600/80 to-red-600/80 backdrop-blur-sm text-white text-center text-sm transition-all duration-300 overflow-hidden ${isScrolled ? 'h-0 py-0' : 'h-auto py-2'}`}>
+            <div className={`transition-opacity duration-300 ${isScrolled ? 'opacity-0' : 'opacity-100'}`}>
+              <span className="animate-pulse-heart bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text font-medium text-slate-50">
+                Veja o resultado e só pague se amar
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </header>
 
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onLogin={handleLogin} />
