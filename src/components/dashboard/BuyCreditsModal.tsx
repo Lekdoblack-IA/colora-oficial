@@ -73,18 +73,25 @@ export const BuyCreditsModal = ({
   };
 
   const ModalContent = () => (
-    <div className="relative bg-white rounded-3xl max-w-md mx-auto">
+    <div className="relative bg-white rounded-3xl max-w-md mx-auto overflow-hidden">
+      {/* Credits Counter Header */}
+      <div className="bg-black text-white text-center py-3 px-6">
+        <span className="text-sm font-medium">
+          Você tem: <span className="font-bold">{currentCredits} Créditos</span> disponíveis
+        </span>
+      </div>
+
       {/* Close Button */}
       <Button
         variant="ghost"
         size="icon"
         onClick={onClose}
-        className="absolute right-4 top-4 z-10 rounded-full hover:bg-gray-100"
+        className="absolute right-4 top-16 z-10 rounded-full hover:bg-gray-100"
       >
         <X className="w-5 h-5 text-gray-500" />
       </Button>
 
-      <div className="p-8 pt-12">
+      <div className="p-8">
         {/* Header */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Escolha seu Pacote</h2>
@@ -111,50 +118,52 @@ export const BuyCreditsModal = ({
           </ToggleGroup>
         </div>
 
-        {/* Package Details */}
+        {/* Package Details with Border */}
         {selectedPkg && (
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Pacote {selectedPkg.name}
-            </h3>
-            
-            <p className="text-gray-600 text-sm mb-6 leading-relaxed px-4">
-              {selectedPkg.description}
-            </p>
-            
-            <div className="mb-4">
-              <div className="flex items-center justify-center mb-2">
-                <span className="text-pink-500 text-2xl font-bold mr-1">R$</span>
-                <span className="text-6xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
-                  {selectedPkg.totalPrice}
-                </span>
+          <div className="border border-gray-200 rounded-2xl p-6 mb-6">
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Pacote {selectedPkg.name}
+              </h3>
+              
+              <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                {selectedPkg.description}
+              </p>
+              
+              <div className="mb-4">
+                <div className="flex items-center justify-center mb-2">
+                  <span className="text-pink-500 text-2xl font-bold mr-1">R$</span>
+                  <span className="text-6xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+                    {selectedPkg.totalPrice}
+                  </span>
+                </div>
+                
+                <p className="text-pink-500 font-medium text-lg">
+                  Apenas {selectedPkg.pricePerCredit} Reais por imagem!
+                </p>
               </div>
               
-              <p className="text-pink-500 font-medium text-lg">
-                Apenas {selectedPkg.pricePerCredit} Reais por imagem!
-              </p>
+              {/* Credit info with tooltip */}
+              <div className="flex items-center justify-center space-x-1 text-sm text-gray-500 mb-6">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="w-4 h-4 cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Seus Créditos serão adicionados automaticamente após o pagamento.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              
+              {/* Savings note */}
+              {selectedPkg.note && (
+                <p className="text-sm text-green-600 font-medium">
+                  {selectedPkg.note}
+                </p>
+              )}
             </div>
-            
-            {/* Credit info with tooltip */}
-            <div className="flex items-center justify-center space-x-1 text-sm text-gray-500 mb-6">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="w-4 h-4 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Seus Créditos serão adicionados automaticamente após o pagamento.</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            
-            {/* Savings note */}
-            {selectedPkg.note && (
-              <p className="text-sm text-green-600 font-medium mb-8">
-                {selectedPkg.note}
-              </p>
-            )}
           </div>
         )}
 
