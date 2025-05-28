@@ -102,7 +102,7 @@ const PricingSection = () => {
                 {/* 3. Preço Total / Preço por imagem - DESTACADO */}
                 <div className="text-center mb-6 bg-gradient-to-br from-pink-50 to-red-50 rounded-2xl p-6 border border-pink-100">
                   <div className="mb-3">
-                    <div className="text-4xl font-bold text-gray-900 mb-3">
+                    <div className="text-4xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent mb-3">
                       R$ {pkg.totalPrice.toFixed(2)}
                     </div>
                     <div className="flex items-center justify-center space-x-2">
@@ -114,10 +114,10 @@ const PricingSection = () => {
                     </div>
                   </div>
                   
-                  {/* Quantidade de Desenhos no Pacote - Movido para baixo do preço */}
+                  {/* Quantidade de Créditos no Pacote - Movido para baixo do preço */}
                   <div className="pt-3 border-t border-pink-200">
                     <span className="text-lg font-semibold text-gray-700">
-                      {pkg.credits} Desenho{pkg.credits > 1 ? 's' : ''} pra Colorir
+                      {pkg.credits} Crédito{pkg.credits > 1 ? 's' : ''}
                     </span>
                   </div>
                 </div>
