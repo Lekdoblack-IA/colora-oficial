@@ -1,12 +1,15 @@
-import { Heart } from 'lucide-react';
+
 const Footer = () => {
   return <footer className="bg-black text-white px-4 py-[30px]">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2 mb-6 md:mb-0">
-            <Heart className="h-6 w-6 text-red-500 fill-current" />
-            <span className="font-bold text-xl">Colora ♡</span>
+            <img 
+              src="/lovable-uploads/994f886c-18af-4dbc-8bca-2ad90885a150.png" 
+              alt="Colora ♡" 
+              className="h-8 w-auto"
+            />
           </div>
 
           {/* Links */}
