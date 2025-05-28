@@ -1,4 +1,5 @@
 
+
 interface GalleryIndicatorsProps {
   totalImages: number;
   currentIndex: number;
@@ -15,7 +16,7 @@ const GalleryIndicators = ({ totalImages, currentIndex, onIndicatorClick }: Gall
           className={`w-3 h-3 rounded-full transition-all duration-500 ${
             index === currentIndex
               ? 'bg-gradient-to-r from-pink-500 to-red-500 scale-125'
-              : 'bg-gray-600/80 hover:bg-gray-700 shadow-lg'
+              : 'bg-gray-300/60 backdrop-blur-sm border border-white/30 hover:bg-gray-300/80 hover:backdrop-blur-md shadow-lg'
           }`}
         />
       ))}
@@ -24,3 +25,4 @@ const GalleryIndicators = ({ totalImages, currentIndex, onIndicatorClick }: Gall
 };
 
 export default GalleryIndicators;
+
