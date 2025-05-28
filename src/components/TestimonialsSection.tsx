@@ -64,7 +64,7 @@ const TestimonialsSection = () => {
                 <div>
                   <div className="font-semibold flex items-center space-x-1">
                     <span>{testimonial.name}</span>
-                    <Heart className="w-4 h-4 text-red-500 fill-current" />
+                    
                   </div>
                   <div className="text-gray-500 text-sm">{testimonial.relationship}</div>
                 </div>
