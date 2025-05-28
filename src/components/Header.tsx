@@ -88,45 +88,42 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
             {/* Navigation - Desktop e Mobile */}
             <div className="flex items-center space-x-4">
               {!isLoggedIn ? (
-                <Button 
+                <button 
                   onClick={() => setIsAuthOpen(true)} 
-                  variant="outline" 
-                  className="!bg-transparent backdrop-blur-sm hover:!bg-white/20 border-gray-200"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-transparent border border-gray-200 rounded-md backdrop-blur-sm hover:bg-white/20 transition-colors"
                 >
                   Entrar
-                </Button>
+                </button>
               ) : (
                 <>
                   {/* Botão Início - apenas no desktop quando não está no dashboard */}
                   {!isDashboard && (
-                    <Button 
+                    <button 
                       onClick={handleInicio}
-                      variant="ghost" 
-                      className="!bg-transparent backdrop-blur-sm hover:!bg-white/20 !border-gray-200 border hidden md:flex"
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-transparent border border-gray-200 rounded-md backdrop-blur-sm hover:bg-white/20 transition-colors hidden md:flex items-center"
                     >
                       Início
-                    </Button>
+                    </button>
                   )}
                   
                   {/* Botão Dashboard - apenas no desktop quando está na página inicial */}
                   {!isDashboard && (
-                    <Button 
+                    <button 
                       onClick={handleDashboard}
-                      variant="ghost" 
-                      className="!bg-transparent backdrop-blur-sm hover:!bg-white/20 !border-gray-200 border hidden md:flex"
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-transparent border border-gray-200 rounded-md backdrop-blur-sm hover:bg-white/20 transition-colors hidden md:flex items-center"
                     >
                       Dashboard
-                    </Button>
+                    </button>
                   )}
                   
                   {/* Dropdown Minha Conta */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="!bg-transparent backdrop-blur-sm hover:!bg-white/20 border-gray-200 flex items-center space-x-2">
+                      <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-transparent border border-gray-200 rounded-md backdrop-blur-sm hover:bg-white/20 transition-colors flex items-center space-x-2">
                         <User className="h-4 w-4" />
                         <span className="hidden md:inline">Minha Conta</span>
                         <ChevronDown className="h-4 w-4" />
-                      </Button>
+                      </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg">
                       <DropdownMenuLabel className="font-normal">
