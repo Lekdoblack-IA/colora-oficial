@@ -32,7 +32,7 @@ const packages = [{
 const PricingSection = () => {
   const [selectedPackage, setSelectedPackage] = useState('plus');
   const selectedPkg = packages.find(pkg => pkg.id === selectedPackage);
-  return <section className="py-20 px-4 bg-gray-50">
+  return <section className="px-4 bg-gray-50 py-[40px]">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold mb-4 md:text-5xl">

@@ -1,6 +1,6 @@
 import { Heart } from 'lucide-react';
 const Footer = () => {
-  return <footer className="bg-black text-white py-12 px-4">
+  return <footer className="bg-black text-white px-4 py-[30px]">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between">
           {/* Logo */}

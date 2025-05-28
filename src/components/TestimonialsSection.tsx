@@ -22,7 +22,7 @@ const testimonials = [{
   image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face"
 }];
 const TestimonialsSection = () => {
-  return <section className="py-20 px-4">
+  return <section className="px-4 py-[40px]">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <div className="flex items-center justify-center space-x-8 mb-8">
