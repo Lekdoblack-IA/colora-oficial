@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -24,15 +25,12 @@ const Header = ({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isBuyCreditsOpen, setIsBuyCreditsOpen] = useState(false);
-  const [internalIsLoggedIn, setInternalIsLoggedIn] = useState(true); // Estado interno para dashboard
-  const [userEmail] = useState("usuario@exemplo.com"); // Mock do email do usuário
+  const [internalIsLoggedIn, setInternalIsLoggedIn] = useState(true);
+  const [userEmail] = useState("usuario@exemplo.com");
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Verificar se está na página do dashboard
   const isDashboard = location.pathname === '/dashboard';
-  
-  // Usar estado externo se fornecido, senão usar interno
   const isLoggedIn = propIsLoggedIn !== undefined ? propIsLoggedIn : internalIsLoggedIn;
 
   useEffect(() => {
@@ -48,7 +46,10 @@ const Header = ({
       setInternalIsLoggedIn(false);
       navigate('/');
     } else {
-      // Lógica para página inicial - resetar estado se necessário
+      // Reset login state for home page
+      if (propIsLoggedIn === undefined) {
+        setInternalIsLoggedIn(false);
+      }
     }
     console.log('Logout realizado');
   };
@@ -83,11 +84,11 @@ const Header = ({
     }
   };
 
-  const handleInicio = () => {
+  const handleGoHome = () => {
     navigate('/');
   };
 
-  const handleDashboard = () => {
+  const handleGoDashboard = () => {
     navigate('/dashboard');
   };
 
@@ -122,7 +123,7 @@ const Header = ({
               </div>
             )}
 
-            {/* Navigation - Desktop e Mobile */}
+            {/* Navigation */}
             <div className="flex items-center space-x-4">
               {!isLoggedIn ? (
                 <Button 
@@ -130,78 +131,52 @@ const Header = ({
                   variant="outline" 
                   className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200"
                 >
-                  Entrar
+                  Login
                 </Button>
               ) : (
-                <>
-                  {/* Botão Início - apenas no desktop quando não está no dashboard */}
-                  {!isDashboard && (
-                    <Button 
-                      onClick={handleInicio}
-                      variant="ghost" 
-                      className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hidden md:flex"
-                    >
-                      Início
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 flex items-center space-x-2">
+                      <User className="h-4 w-4" />
+                      <span className="hidden md:inline">Minha Conta</span>
+                      <ChevronDown className="h-4 w-4" />
                     </Button>
-                  )}
-                  
-                  {/* Botão Dashboard - apenas no desktop quando está na página inicial */}
-                  {!isDashboard && (
-                    <Button 
-                      onClick={handleDashboard}
-                      variant="ghost" 
-                      className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hidden md:flex"
-                    >
-                      Dashboard
-                    </Button>
-                  )}
-                  
-                  {/* Dropdown Minha Conta */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 flex items-center space-x-2">
-                        <User className="h-4 w-4" />
-                        <span className="hidden md:inline">Minha Conta</span>
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg">
-                      <DropdownMenuLabel className="font-normal">
-                        <div className="flex flex-col space-y-1">
-                          <p className="text-sm font-medium leading-none">Minha Conta</p>
-                          <p className="text-xs leading-none text-muted-foreground">
-                            {userEmail}
-                          </p>
-                        </div>
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      
-                      {/* Mostrar "Voltar para o Inicio" se estiver no dashboard */}
-                      {isDashboard ? (
-                        <DropdownMenuItem onClick={handleInicio}>
-                          <Home className="mr-2 h-4 w-4" />
-                          Voltar para o Inicio
-                        </DropdownMenuItem>
-                      ) : (
-                        /* Mostrar "Ir para Dashboard" se estiver na página inicial */
-                        <DropdownMenuItem onClick={handleDashboard}>
-                          <LayoutDashboard className="mr-2 h-4 w-4" />
-                          Ir para Dashboard
-                        </DropdownMenuItem>
-                      )}
-                      
-                      <DropdownMenuItem onClick={handleBuyCredits}>
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        Comprar Créditos
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg">
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">Minha Conta</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {userEmail}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    
+                    {/* Navegação condicional baseada na página atual */}
+                    {isDashboard ? (
+                      <DropdownMenuItem onClick={handleGoHome}>
+                        <Home className="mr-2 h-4 w-4" />
+                        Voltar para o Inicio
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Sair
+                    ) : (
+                      <DropdownMenuItem onClick={handleGoDashboard}>
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Ir para Dashboard
                       </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </>
+                    )}
+                    
+                    <DropdownMenuItem onClick={handleBuyCredits}>
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      Comprar Créditos
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sair
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </div>
