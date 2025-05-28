@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { ModalHeader } from './ModalHeader';
 import { PackageSelector } from './PackageSelector';
 import { PackageCard } from './PackageCard';
 import { SecurityNotice } from './SecurityNotice';
+import { X } from 'lucide-react';
 
 interface BuyCreditsModalProps {
   isOpen: boolean;
@@ -74,9 +74,51 @@ export const BuyCreditsModal = ({
     }, 2000);
   };
 
+  const DesktopModalHeader = () => (
+    <>
+      {/* Credits Counter Header */}
+      <div className="bg-black text-white text-center py-3 px-6">
+        <span className="text-sm font-medium">
+          Você tem: <span className="font-bold">{currentCredits} Créditos</span> disponíveis
+        </span>
+      </div>
+
+      {/* Close Button in top right */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onClose}
+        className="absolute right-4 top-16 z-10 rounded-full hover:bg-gray-100"
+      >
+        <X className="w-5 h-5 text-gray-500" />
+      </Button>
+    </>
+  );
+
+  const MobileModalHeader = () => (
+    <>
+      {/* Credits Counter Header */}
+      <div className="bg-black text-white text-center py-3 px-6">
+        <span className="text-sm font-medium">
+          Você tem: <span className="font-bold">{currentCredits} Créditos</span> disponíveis
+        </span>
+      </div>
+
+      {/* Close Button in top right */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onClose}
+        className="absolute right-4 top-16 z-10 rounded-full hover:bg-gray-100"
+      >
+        <X className="w-5 h-5 text-gray-500" />
+      </Button>
+    </>
+  );
+
   const DesktopModalContent = () => (
     <div className="relative bg-white rounded-3xl max-w-md mx-auto overflow-hidden">
-      <ModalHeader currentCredits={currentCredits} onClose={onClose} />
+      <DesktopModalHeader />
 
       <div className="p-8">
         {/* Header */}
@@ -120,10 +162,10 @@ export const BuyCreditsModal = ({
   );
 
   const MobileModalContent = () => (
-    <div className="bg-white rounded-t-3xl h-full flex flex-col overflow-hidden">
+    <div className="bg-white h-full flex flex-col overflow-hidden">
       {/* Fixed Header */}
       <div className="flex-shrink-0">
-        <ModalHeader currentCredits={currentCredits} onClose={onClose} />
+        <MobileModalHeader />
       </div>
 
       {/* Scrollable Content */}
@@ -184,7 +226,7 @@ export const BuyCreditsModal = ({
   if (isMobile) {
     return (
       <Drawer open={isOpen} onOpenChange={onClose}>
-        <DrawerContent className="h-[85vh] border-0 p-0">
+        <DrawerContent className="h-[85vh] border-0 p-0 rounded-t-3xl">
           <DialogTitle className="sr-only">Comprar Créditos</DialogTitle>
           <DialogDescription className="sr-only">
             Modal para escolher e comprar pacotes de créditos para desbloquear imagens
