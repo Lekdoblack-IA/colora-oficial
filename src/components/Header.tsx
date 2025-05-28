@@ -91,7 +91,7 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                 <Button 
                   onClick={() => setIsAuthOpen(true)} 
                   variant="outline" 
-                  className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200"
+                  className="bg-transparent backdrop-blur-sm hover:bg-white/20 border-gray-200"
                 >
                   Entrar
                 </Button>
@@ -102,7 +102,7 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                     <Button 
                       onClick={handleInicio}
                       variant="ghost" 
-                      className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hidden md:flex"
+                      className="bg-transparent backdrop-blur-sm hover:bg-white/20 border-gray-200 hidden md:flex"
                     >
                       Início
                     </Button>
@@ -113,7 +113,7 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                     <Button 
                       onClick={handleDashboard}
                       variant="ghost" 
-                      className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 hidden md:flex"
+                      className="bg-transparent backdrop-blur-sm hover:bg-white/20 border-gray-200 hidden md:flex"
                     >
                       Dashboard
                     </Button>
@@ -122,7 +122,7 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
                   {/* Dropdown Minha Conta */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="bg-white/90 backdrop-blur-sm hover:bg-white border-gray-200 flex items-center space-x-2">
+                      <Button variant="outline" className="bg-transparent backdrop-blur-sm hover:bg-white/20 border-gray-200 flex items-center space-x-2">
                         <User className="h-4 w-4" />
                         <span className="hidden md:inline">Minha Conta</span>
                         <ChevronDown className="h-4 w-4" />
