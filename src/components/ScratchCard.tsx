@@ -23,20 +23,22 @@ const ScratchCard = () => {
     canvas.height = rect.height * window.devicePixelRatio;
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 
-    // Criar gradiente para a sobreposição
-    const gradient = ctx.createLinearGradient(0, 0, rect.width, rect.height);
-    gradient.addColorStop(0, '#f3f4f6');
-    gradient.addColorStop(1, '#e5e7eb');
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, rect.width, rect.height);
-
-    // Adicionar texto - responsivo baseado no tamanho do canvas
-    ctx.fillStyle = '#6b7280';
-    const fontSize = Math.min(rect.width * 0.04, 16);
-    ctx.font = `bold ${fontSize}px Inter`;
-    ctx.textAlign = 'center';
-    ctx.fillText('Raspe para ver a mágica', rect.width / 2, rect.height / 2);
+    // Criar uma imagem para a cobertura
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      
+      // Adicionar texto sobre a imagem
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      ctx.fillRect(0, rect.height - 40, rect.width, 40);
+      
+      ctx.fillStyle = '#ffffff';
+      const fontSize = Math.min(rect.width * 0.04, 16);
+      ctx.font = `bold ${fontSize}px Inter`;
+      ctx.textAlign = 'center';
+      ctx.fillText('Raspe para ver a mágica', rect.width / 2, rect.height - 15);
+    };
+    img.src = '/lovable-uploads/955a3ce1-0cb0-4025-88e3-e2fca7f934dc.png';
   }, []);
 
   const getEventPosition = (e: React.MouseEvent | React.TouchEvent) => {
@@ -103,15 +105,15 @@ const ScratchCard = () => {
     <div className="w-full max-w-sm mx-auto">
       <AspectRatio ratio={4/5}>
         <div className="relative w-full h-full rounded-3xl overflow-hidden border border-gray-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:border-transparent hover:-translate-y-1">
-          {/* Imagem de baixo - desenho */}
+          {/* Imagem de baixo - desenho para colorir */}
           <div 
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center bg-white"
             style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop&crop=faces')"
+              backgroundImage: "url('/lovable-uploads/281ee0c9-3370-4346-a604-231d215ef59f.png')"
             }}
           />
           
-          {/* Canvas de raspagem */}
+          {/* Canvas de raspagem com a foto colorida */}
           <canvas
             ref={canvasRef}
             className="absolute inset-0 w-full h-full scratch-canvas touch-none"
