@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Lock, Download, Clock } from 'lucide-react';
+import { Lock, Download, Clock, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -13,9 +13,11 @@ interface UserImage {
   createdAt: Date;
   expiresAt?: Date;
 }
+
 interface UserImagesGalleryProps {
   images: UserImage[];
   onUnlockImage: (imageId: string) => void;
+  onDeleteImage: (imageId: string) => void;
   isImageExpired: (image: UserImage) => boolean;
 }
 
@@ -50,6 +52,7 @@ const TimeLeft = ({
 export const UserImagesGallery = ({
   images,
   onUnlockImage,
+  onDeleteImage,
   isImageExpired
 }: UserImagesGalleryProps) => {
   const {
@@ -121,30 +124,49 @@ export const UserImagesGallery = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {images.map(image => {
-        const expired = isImageExpired(image);
-        const isLocked = !image.isUnlocked && !expired;
-        return <div key={image.id} className="relative group">
+          const expired = isImageExpired(image);
+          const isLocked = !image.isUnlocked && !expired;
+          
+          return (
+            <div key={image.id} className="relative group">
               <div className="relative overflow-hidden rounded-lg shadow-md">
                 <AspectRatio ratio={4 / 5}>
-                  <img src={image.transformedUrl} alt="Desenho transformado" className={`w-full h-full object-cover transition-all duration-300 ${isLocked ? 'filter blur-[2px]' : ''}`} />
+                  <img 
+                    src={image.transformedUrl} 
+                    alt="Desenho transformado" 
+                    className={`w-full h-full object-cover transition-all duration-300 ${isLocked ? 'filter blur-[2px]' : ''}`} 
+                  />
                   
                   {/* Overlay para imagens bloqueadas */}
-                  {isLocked && <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                  {isLocked && (
+                    <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
                       <div className="text-center text-white rounded-xl px-[12px] py-[14px] bg-black/[0.38]">
                         <Lock className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2" />
                         <p className="font-medium text-sm md:text-base">Bloqueada</p>
                         <p className="text-xs md:text-sm opacity-90">Use créditos para liberar</p>
                       </div>
-                    </div>}
+                    </div>
+                  )}
 
                   {/* Overlay para imagens expiradas */}
-                  {expired && <div className="absolute inset-0 bg-red-500 bg-opacity-70 flex items-center justify-center">
+                  {expired && (
+                    <div className="absolute inset-0 bg-red-500 bg-opacity-70 flex items-center justify-center">
                       <div className="text-center text-white">
                         <Clock className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2" />
                         <p className="font-medium text-sm md:text-base">Expirada</p>
                         <p className="text-xs md:text-sm opacity-90">Esta imagem não está mais disponível</p>
                       </div>
-                    </div>}
+                      
+                      {/* Ícone de lixeira para imagens expiradas */}
+                      <button
+                        onClick={() => onDeleteImage(image.id)}
+                        className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 rounded-full p-2 transition-colors shadow-lg"
+                        title="Excluir imagem expirada"
+                      >
+                        <Trash className="w-4 h-4 text-white" />
+                      </button>
+                    </div>
+                  )}
                 </AspectRatio>
               </div>
 
@@ -154,22 +176,39 @@ export const UserImagesGallery = ({
                   <div className="text-xs md:text-sm text-gray-600">
                     {image.createdAt.toLocaleDateString('pt-BR')}
                   </div>
-                  {image.expiresAt && !image.isUnlocked && !expired && <TimeLeft expiresAt={image.expiresAt} />}
+                  {image.expiresAt && !image.isUnlocked && !expired && (
+                    <TimeLeft expiresAt={image.expiresAt} />
+                  )}
                 </div>
 
                 {/* Botões de ação */}
-                {!expired && <div className="space-y-2">
-                    {!image.isUnlocked ? <Button onClick={() => onUnlockImage(image.id)} className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 min-h-[44px]" size="sm">
+                {!expired && (
+                  <div className="space-y-2">
+                    {!image.isUnlocked ? (
+                      <Button 
+                        onClick={() => onUnlockImage(image.id)} 
+                        className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 min-h-[44px]" 
+                        size="sm"
+                      >
                         <Download className="w-4 h-4 mr-2" />
                         Desbloquear
-                      </Button> : <Button onClick={() => handleDownload(image.transformedUrl, image.id)} className="w-full bg-green-600 hover:bg-green-700 min-h-[44px]" size="sm">
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={() => handleDownload(image.transformedUrl, image.id)} 
+                        className="w-full bg-green-600 hover:bg-green-700 min-h-[44px]" 
+                        size="sm"
+                      >
                         <Download className="w-4 h-4 mr-2" />
                         Download
-                      </Button>}
-                  </div>}
+                      </Button>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>;
-      })}
+            </div>
+          );
+        })}
       </div>
     </section>;
 };

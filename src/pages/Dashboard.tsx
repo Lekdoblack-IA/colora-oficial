@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
@@ -66,6 +65,15 @@ const Dashboard = () => {
     });
   };
 
+  const handleDeleteImage = (imageId: string) => {
+    setUserImages(prev => prev.filter(img => img.id !== imageId));
+    
+    toast({
+      title: "Imagem excluída",
+      description: "A imagem expirada foi removida do seu histórico.",
+    });
+  };
+
   const handleCreditsAdded = (credits: number) => {
     if (user) {
       updateCredits(user.credits + credits);
@@ -114,6 +122,7 @@ const Dashboard = () => {
           <UserImagesGallery 
             images={userImages}
             onUnlockImage={handleUnlockImage}
+            onDeleteImage={handleDeleteImage}
             isImageExpired={isImageExpired}
           />
         </div>
