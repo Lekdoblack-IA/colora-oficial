@@ -23,7 +23,7 @@ interface AuthContextType {
   session: Session | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, userMetadata: any) => Promise<void>;
   logout: () => Promise<void>;
   updateCredits: (credits: number) => void;
   resetPassword: (email: string) => Promise<void>;
@@ -153,17 +153,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (email: string, password: string, userMetadata: any) => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            name: name,
-            full_name: name
-          }
+          data: userMetadata
         }
       });
 
