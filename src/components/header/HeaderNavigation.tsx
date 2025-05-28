@@ -41,6 +41,10 @@ export const HeaderNavigation = ({
     <UserDropdown
       onLogout={onLogout}
       userCredits={userCredits}
+      isDashboard={isDashboard}
+      onGoHome={onGoHome}
+      onGoDashboard={onGoDashboard}
+      onBuyCredits={onBuyCredits}
     />
   );
 };
