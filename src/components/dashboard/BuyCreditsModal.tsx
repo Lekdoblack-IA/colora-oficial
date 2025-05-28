@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ModalHeader } from './ModalHeader';
 import { PackageSelector } from './PackageSelector';
@@ -73,7 +74,7 @@ export const BuyCreditsModal = ({
     }, 2000);
   };
 
-  const ModalContent = () => (
+  const DesktopModalContent = () => (
     <div className="relative bg-white rounded-3xl max-w-md mx-auto overflow-hidden">
       <ModalHeader currentCredits={currentCredits} onClose={onClose} />
 
@@ -118,11 +119,77 @@ export const BuyCreditsModal = ({
     </div>
   );
 
+  const MobileModalContent = () => (
+    <div className="bg-white rounded-t-3xl h-full flex flex-col overflow-hidden">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0">
+        <ModalHeader currentCredits={currentCredits} onClose={onClose} />
+      </div>
+
+      {/* Scrollable Content */}
+      <ScrollArea className="flex-1 px-6 pb-6">
+        <div className="pt-4 pb-8">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Escolha seu Pacote</h2>
+            <p className="text-gray-600 text-sm">E use Créditos para Desbloquear o Download</p>
+          </div>
+
+          <div className="mb-6">
+            <PackageSelector 
+              packages={packages}
+              selectedPackage={selectedPackage}
+              onPackageChange={setSelectedPackage}
+            />
+          </div>
+
+          {selectedPkg && (
+            <div className="mb-4">
+              <PackageCard selectedPackage={selectedPkg} />
+            </div>
+          )}
+
+          {/* Savings note - moved outside the border */}
+          {selectedPkg?.note && (
+            <div className="text-center mb-6">
+              <p className="text-sm text-green-600 font-medium">
+                {selectedPkg.note}
+              </p>
+            </div>
+          )}
+
+          {/* Security Notice */}
+          <div className="mb-6">
+            <SecurityNotice />
+          </div>
+        </div>
+      </ScrollArea>
+
+      {/* Fixed Bottom CTA */}
+      <div className="flex-shrink-0 p-6 bg-white border-t border-gray-100">
+        <Button 
+          onClick={handlePurchase}
+          disabled={isProcessingPayment}
+          className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-full h-14 font-semibold text-lg"
+        >
+          {isProcessingPayment 
+            ? 'Processando...' 
+            : `Comprar ${selectedPkg?.credits} ${selectedPkg?.credits === 1 ? 'Crédito' : 'Créditos'} >`
+          }
+        </Button>
+      </div>
+    </div>
+  );
+
   if (isMobile) {
     return (
       <Drawer open={isOpen} onOpenChange={onClose}>
-        <DrawerContent className="max-h-[90vh] border-0">
-          <ModalContent />
+        <DrawerContent className="h-[85vh] border-0 p-0">
+          <DialogTitle className="sr-only">Comprar Créditos</DialogTitle>
+          <DialogDescription className="sr-only">
+            Modal para escolher e comprar pacotes de créditos para desbloquear imagens
+          </DialogDescription>
+          <MobileModalContent />
         </DrawerContent>
       </Drawer>
     );
@@ -135,7 +202,7 @@ export const BuyCreditsModal = ({
         <DialogDescription className="sr-only">
           Modal para escolher e comprar pacotes de créditos para desbloquear imagens
         </DialogDescription>
-        <ModalContent />
+        <DesktopModalContent />
       </DialogContent>
     </Dialog>
   );
