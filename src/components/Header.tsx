@@ -95,7 +95,7 @@ const Header = () => {
         {/* Banner fixo abaixo do cabeçalho com retração no scroll */}
         <div className={`bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 text-white text-center text-sm transition-all duration-300 overflow-hidden ${
           isScrolled 
-            ? 'h-0 py-0' 
+            ? 'h-1 py-0' 
             : 'h-auto py-2'
         }`}>
           <div className={`transition-opacity duration-300 ${isScrolled ? 'opacity-0' : 'opacity-100'}`}>
