@@ -1,15 +1,5 @@
-
 import { useRef, useEffect } from 'react';
-
-interface Particle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  life: number;
-  maxLife: number;
-  size: number;
-}
+import { Particle } from '@/types/scratchCard';
 
 interface ParticleCanvasProps {
   particles: Particle[];
