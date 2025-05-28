@@ -88,43 +88,43 @@ const PricingSection = () => {
                 )}
 
                 {/* 1. Nome do pacote */}
-                <div className="text-center mb-4">
+                <div className="text-center mb-6">
                   <h3 className="text-2xl font-bold text-gray-900">{pkg.name}</h3>
                 </div>
 
-                {/* 2. Quantidade de Desenhos no Pacote */}
-                <div className="text-center mb-6">
-                  <span className="text-lg font-semibold text-gray-700">
-                    {pkg.credits} Desenho{pkg.credits > 1 ? 's' : ''} pra Colorir
-                  </span>
-                </div>
-
-                {/* 3. Descrição */}
+                {/* 2. Descrição */}
                 <div className="text-center mb-8">
                   <p className="text-gray-600 leading-relaxed text-base">
                     {pkg.description}
                   </p>
                 </div>
 
-                {/* 4. Preço Total / Preço por imagem */}
-                <div className="text-center mb-6">
-                  <div className="mb-2">
-                    <div className="text-3xl font-bold text-gray-900 mb-2">
+                {/* 3. Preço Total / Preço por imagem - DESTACADO */}
+                <div className="text-center mb-6 bg-gradient-to-br from-pink-50 to-red-50 rounded-2xl p-6 border border-pink-100">
+                  <div className="mb-3">
+                    <div className="text-4xl font-bold text-gray-900 mb-3">
                       R$ {pkg.totalPrice.toFixed(2)}
                     </div>
                     <div className="flex items-center justify-center space-x-2">
-                      <span className="text-xl font-bold text-pink-500">R${pkg.pricePerCredit}</span>
-                      <span className="text-gray-600">por imagem</span>
+                      <span className="text-2xl font-bold text-pink-600">R${pkg.pricePerCredit}</span>
+                      <span className="text-gray-600 text-lg">por imagem</span>
                       {pkg.pricePerCredit < 5 && (
-                        <span className="text-gray-400 line-through text-sm">R$5</span>
+                        <span className="text-gray-400 line-through text-base">R$5</span>
                       )}
                     </div>
                   </div>
+                  
+                  {/* Quantidade de Desenhos no Pacote - Movido para baixo do preço */}
+                  <div className="pt-3 border-t border-pink-200">
+                    <span className="text-lg font-semibold text-gray-700">
+                      {pkg.credits} Desenho{pkg.credits > 1 ? 's' : ''} pra Colorir
+                    </span>
+                  </div>
                 </div>
 
-                {/* 5. Nota discreta */}
+                {/* 4. Nota discreta - Próxima do botão CTA */}
                 {pkg.note && (
-                  <div className="text-center mb-8">
+                  <div className="text-center mb-4">
                     <p className={`text-sm ${
                       pkg.isPopular ? 'text-green-600 font-medium' : 'text-gray-500'
                     }`}>
@@ -133,12 +133,12 @@ const PricingSection = () => {
                   </div>
                 )}
 
-                {/* 6. Botão CTA */}
+                {/* 5. Botão CTA */}
                 <Button className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white py-4 rounded-full text-lg font-semibold mb-6 h-auto">
                   Transforme sua foto antes de Pagar
                 </Button>
 
-                {/* 7. Tooltip */}
+                {/* 6. Tooltip */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
