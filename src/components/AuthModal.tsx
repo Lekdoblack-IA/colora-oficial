@@ -61,7 +61,7 @@ export const AuthModal = ({
 
         <div className="p-6">
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 p-1 bg-gray-100/55 rounded-full px-[4px] py-[4px] my-0">
+            <TabsList className="grid w-full grid-cols-3 p-1 rounded-full px-[4px] py-[4px] my-0 bg-gray-100/0">
               <TabsTrigger value="login" className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-full py-[6px] px-0 mx-[5px] my-0">
                 Entrar
               </TabsTrigger>
@@ -88,9 +88,7 @@ export const AuthModal = ({
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t border-gray-200" />
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-3 text-gray-500 font-medium">ou</span>
-                </div>
+                
               </div>
 
               <div className="space-y-4">
