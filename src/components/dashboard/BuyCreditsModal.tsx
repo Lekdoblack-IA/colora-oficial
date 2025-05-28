@@ -1,4 +1,5 @@
 
+
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -156,14 +157,16 @@ export const BuyCreditsModal = ({
                   Apenas {selectedPkg.pricePerCredit} Reais por imagem!
                 </p>
               </div>
-              
-              {/* Savings note */}
-              {selectedPkg.note && (
-                <p className="text-sm text-green-600 font-medium">
-                  {selectedPkg.note}
-                </p>
-              )}
             </div>
+          </div>
+        )}
+
+        {/* Savings note - moved outside the border */}
+        {selectedPkg?.note && (
+          <div className="text-center mb-4">
+            <p className="text-sm text-green-600 font-medium">
+              {selectedPkg.note}
+            </p>
           </div>
         )}
 
@@ -212,3 +215,4 @@ export const BuyCreditsModal = ({
     </Dialog>
   );
 };
+
