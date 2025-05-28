@@ -80,7 +80,7 @@ const PricingSection = () => {
               {/* Preço */}
               <div className="mb-2">
                 <span className="text-pink-500 text-xl font-medium mr-1">R$</span>
-                <span className="text-5xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+                <span className="font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent text-6xl">
                   {selectedPkg?.totalPrice}
                 </span>
               </div>
