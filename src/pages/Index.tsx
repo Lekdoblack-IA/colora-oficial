@@ -45,7 +45,10 @@ const Index = () => {
       />
       <GallerySection />
       <HowItWorksSection />
-      <PricingSection />
+      <PricingSection 
+        isLoggedIn={isLoggedIn} 
+        onAuthModalOpen={handleAuthModalOpen} 
+      />
       <TestimonialsSection />
       <FAQSection />
       <Footer />
