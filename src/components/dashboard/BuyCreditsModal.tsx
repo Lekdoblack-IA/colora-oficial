@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { X, Shield } from 'lucide-react';
+import { X, Shield, Info } from 'lucide-react';
 
 interface BuyCreditsModalProps {
   isOpen: boolean;
@@ -72,91 +72,101 @@ export const BuyCreditsModal = ({
   };
 
   const ModalContent = () => (
-    <div className="p-6 max-w-lg mx-auto">
-      {/* Header */}
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold mb-2">Escolha seu Pacote</h2>
-        <p className="text-gray-600">1 Crédito = 1 Desenho pra Colorir</p>
-        <div className="mt-4 text-sm text-gray-500">
-          Você tem: {currentCredits} créditos disponíveis
+    <div className="relative bg-white rounded-3xl max-w-md mx-auto">
+      {/* Close Button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onClose}
+        className="absolute right-4 top-4 z-10 rounded-full hover:bg-gray-100"
+      >
+        <X className="w-5 h-5 text-gray-500" />
+      </Button>
+
+      <div className="p-8 pt-12">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Escolha seu Pacote</h2>
+          <p className="text-gray-600">E use Créditos para Desbloquear o Download</p>
         </div>
-      </div>
 
-      {/* Package Toggle */}
-      <div className="mb-6">
-        <ToggleGroup 
-          type="single" 
-          value={selectedPackage} 
-          onValueChange={(value) => value && setSelectedPackage(value)}
-          className="grid grid-cols-3 w-full rounded-full bg-gray-100 p-1"
-        >
-          {packages.map(pkg => (
-            <ToggleGroupItem 
-              key={pkg.id}
-              value={pkg.id} 
-              className="rounded-full text-sm font-medium transition-all duration-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-pink-500 data-[state=on]:to-red-500 data-[state=on]:text-white data-[state=on]:shadow-md"
-            >
-              {pkg.name}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-      </div>
+        {/* Package Toggle */}
+        <div className="mb-8">
+          <ToggleGroup 
+            type="single" 
+            value={selectedPackage} 
+            onValueChange={(value) => value && setSelectedPackage(value)}
+            className="grid grid-cols-3 w-full rounded-full bg-gray-100 p-1"
+          >
+            {packages.map(pkg => (
+              <ToggleGroupItem 
+                key={pkg.id}
+                value={pkg.id} 
+                className="rounded-full text-sm font-medium transition-all duration-300 data-[state=on]:bg-gradient-to-r data-[state=on]:from-pink-500 data-[state=on]:to-red-500 data-[state=on]:text-white data-[state=on]:shadow-md text-gray-600"
+              >
+                {pkg.name}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
 
-      {/* Package Details */}
-      {selectedPkg && (
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
-          <div className="text-center">
-            <h3 className="text-xl font-bold mb-2">
+        {/* Package Details */}
+        {selectedPkg && (
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
               Pacote {selectedPkg.name}
             </h3>
             
-            <div className="text-center mb-4">
-              <span className="text-pink-500 text-lg font-bold">R$</span>
-              <span className="text-4xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
-                {selectedPkg.totalPrice}
-              </span>
-            </div>
-            
-            <p className="text-pink-500 font-medium mb-4">
-              Apenas R${selectedPkg.pricePerCredit} por imagem!
-            </p>
-            
-            <div className="mb-4">
-              <p className="font-medium text-gray-900 mb-1">
-                {selectedPkg.credits} {selectedPkg.credits === 1 ? 'Desenho' : 'Desenhos'} pra Colorir
-              </p>
-            </div>
-            
-            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+            <p className="text-gray-600 text-sm mb-6 leading-relaxed px-4">
               {selectedPkg.description}
             </p>
             
+            <div className="mb-4">
+              <div className="flex items-center justify-center mb-2">
+                <span className="text-pink-500 text-2xl font-bold mr-1">R$</span>
+                <span className="text-6xl font-bold bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">
+                  {selectedPkg.totalPrice}
+                </span>
+              </div>
+              
+              <p className="text-pink-500 font-medium text-lg">
+                Apenas {selectedPkg.pricePerCredit} Reais por imagem!
+              </p>
+            </div>
+            
+            {/* Credit info */}
+            <div className="flex items-center justify-center space-x-1 text-sm text-gray-500 mb-6">
+              <Info className="w-4 h-4" />
+              <span>Seus Créditos serão adicionados automaticamente após o pagamento.</span>
+            </div>
+            
+            {/* Savings note */}
             {selectedPkg.note && (
-              <p className="text-sm text-green-600 font-medium">
+              <p className="text-sm text-green-600 font-medium mb-8">
                 {selectedPkg.note}
               </p>
             )}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* CTA Button */}
-      <Button 
-        onClick={handlePurchase}
-        disabled={isProcessingPayment}
-        className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-full h-12 font-semibold mb-4"
-      >
-        {isProcessingPayment 
-          ? 'Processando...' 
-          : `Comprar ${selectedPkg?.credits} ${selectedPkg?.credits === 1 ? 'Crédito' : 'Créditos'}`
-        }
-      </Button>
+        {/* CTA Button */}
+        <Button 
+          onClick={handlePurchase}
+          disabled={isProcessingPayment}
+          className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-full h-14 font-semibold text-lg mb-4"
+        >
+          {isProcessingPayment 
+            ? 'Processando...' 
+            : `Comprar ${selectedPkg?.credits} ${selectedPkg?.credits === 1 ? 'Crédito' : 'Créditos'} >`
+          }
+        </Button>
 
-      {/* Security Notice */}
-      <div className="text-center">
-        <div className="flex items-center justify-center space-x-1 text-sm text-gray-500 opacity-50">
-          <Shield className="w-4 h-4" />
-          <span>Pagamento 100% seguro</span>
+        {/* Security Notice */}
+        <div className="text-center">
+          <div className="flex items-center justify-center space-x-1 text-sm text-gray-500">
+            <Shield className="w-4 h-4" />
+            <span>Pagamento 100% Seguro</span>
+          </div>
         </div>
       </div>
     </div>
@@ -165,17 +175,7 @@ export const BuyCreditsModal = ({
   if (isMobile) {
     return (
       <Drawer open={isOpen} onOpenChange={onClose}>
-        <DrawerContent className="max-h-[90vh]">
-          <div className="flex justify-end p-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="rounded-full"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
+        <DrawerContent className="max-h-[90vh] border-0">
           <ModalContent />
         </DrawerContent>
       </Drawer>
@@ -184,7 +184,7 @@ export const BuyCreditsModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg border-0 p-0">
+      <DialogContent className="sm:max-w-lg border-0 p-0 bg-transparent shadow-none">
         <DialogTitle className="sr-only">Comprar Créditos</DialogTitle>
         <DialogDescription className="sr-only">
           Modal para escolher e comprar pacotes de créditos para desbloquear imagens
