@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -81,15 +80,28 @@ export const BuyCreditsModal = ({
         </span>
       </div>
 
-      {/* Close Button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onClose}
-        className="absolute right-4 top-16 z-10 rounded-full hover:bg-gray-100"
-      >
-        <X className="w-5 h-5 text-gray-500" />
-      </Button>
+      {/* Tooltip and Close Button */}
+      <div className="absolute right-4 top-16 z-10 flex items-center space-x-2">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="w-5 h-5 text-gray-500 cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Seus Créditos serão adicionados automaticamente após o pagamento.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="rounded-full hover:bg-gray-100"
+        >
+          <X className="w-5 h-5 text-gray-500" />
+        </Button>
+      </div>
 
       <div className="p-8">
         {/* Header */}
@@ -141,20 +153,6 @@ export const BuyCreditsModal = ({
                 <p className="text-pink-500 font-medium text-lg">
                   Apenas {selectedPkg.pricePerCredit} Reais por imagem!
                 </p>
-              </div>
-              
-              {/* Credit info with tooltip */}
-              <div className="flex items-center justify-center space-x-1 text-sm text-gray-500 mb-6">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="w-4 h-4 cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Seus Créditos serão adicionados automaticamente após o pagamento.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
               </div>
               
               {/* Savings note */}
