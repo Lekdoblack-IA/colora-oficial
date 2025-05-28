@@ -63,21 +63,13 @@ const HowItWorksSection = () => {
                 }}
               >
                 {/* Número */}
-                <div className={`relative inline-flex items-center justify-center w-16 h-16 rounded-full bg-white border border-black mb-6 transition-all duration-500 ${
-                  shouldAnimate && isMobile
-                    ? 'border-pink-500 shadow-lg -translate-y-1 bg-pink-50'
-                    : 'group-hover:border-transparent group-hover:shadow-lg group-hover:-translate-y-1'
-                }`}>
+                <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-full bg-white border border-black mb-6 group-hover:border-pink-500 group-hover:shadow-lg group-hover:-translate-y-1 group-hover:bg-pink-50 transition-all duration-300">
                   <span className="text-xl font-bold">{step.number}</span>
                 </div>
 
                 {/* Ícone */}
                 <div className="mb-4">
-                  <Icon className={`w-12 h-12 mx-auto transition-colors duration-500 ${
-                    shouldAnimate && isMobile
-                      ? 'text-pink-500'
-                      : 'text-gray-600 group-hover:text-pink-500'
-                  }`} />
+                  <Icon className="w-12 h-12 mx-auto text-gray-600 group-hover:text-pink-500 transition-colors duration-300" />
                 </div>
 
                 {/* Conteúdo */}
