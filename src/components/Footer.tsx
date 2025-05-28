@@ -6,7 +6,7 @@ const Footer = () => {
           {/* Logo e Descrição */}
           <div className="md:col-span-2">
             <div className="flex items-center mb-4">
-              <img src="/lovable-uploads/ee0393c6-5834-4e27-b4e2-7731aac513e6.png" alt="Colora♡" className="h-8" />
+              <img alt="Colora♡" className="h-8" src="/lovable-uploads/0f9cbd95-67ce-4b8a-9293-9b80892d6546.png" />
             </div>
             <p className="text-gray-400 mb-4 max-w-md">
               Transforme suas memórias mais especiais em desenhos únicos para colorir. 
