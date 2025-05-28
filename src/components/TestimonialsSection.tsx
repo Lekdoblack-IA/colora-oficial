@@ -1,8 +1,11 @@
+
 import { Star, Heart } from 'lucide-react';
+
 const testimonials = [{
   id: 1,
   name: "Maria Silva",
   relationship: "Namorada há 2 anos",
+  state: "São Paulo - SP",
   text: "Transformei nossa primeira foto juntos em um desenho lindo! Meu namorado ficou emocionado quando dei de presente. É uma lembrança que vamos guardar para sempre.",
   rating: 5,
   image: "https://images.unsplash.com/photo-1494790108755-2616b612b5e5?w=64&h=64&fit=crop&crop=face"
@@ -10,17 +13,20 @@ const testimonials = [{
   id: 2,
   name: "João Santos",
   relationship: "Pai de família",
+  state: "Rio de Janeiro - RJ",
   text: "Fiz um álbum inteiro com fotos da família! As crianças adoraram colorir e agora temos uma atividade especial para fazer juntos nos fins de semana.",
   rating: 5,
-  image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face"
+  image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face"
 }, {
   id: 3,
   name: "Ana Costa",
   relationship: "Recém-casada",
+  state: "Minas Gerais - MG",
   text: "Usei nas nossas fotos de casamento e ficou perfeito! Criamos um livro personalizado para os convidados colorarem na festa. Foi um sucesso total!",
   rating: 5,
   image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face"
 }];
+
 const TestimonialsSection = () => {
   return <section className="px-4 py-[40px]">
       <div className="max-w-7xl mx-auto">
@@ -64,8 +70,8 @@ const TestimonialsSection = () => {
                 <div>
                   <div className="font-semibold flex items-center space-x-1">
                     <span>{testimonial.name}</span>
-                    
                   </div>
+                  <div className="text-gray-500 text-sm">{testimonial.state}</div>
                   <div className="text-gray-500 text-sm">{testimonial.relationship}</div>
                 </div>
               </div>
@@ -74,4 +80,5 @@ const TestimonialsSection = () => {
       </div>
     </section>;
 };
+
 export default TestimonialsSection;
