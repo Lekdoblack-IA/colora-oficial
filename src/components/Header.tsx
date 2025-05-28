@@ -26,7 +26,7 @@ const Header = () => {
   return <>
       <header className="fixed top-0 left-0 right-0 z-50">
         {/* Header principal com glassmorphism */}
-        <div className="bg-white/80 backdrop-blur-md border-b border-white/20 px-4 py-[21px]">
+        <div className="bg-white/80 backdrop-blur-md border-b border-white/20 px-4 py-[25px]">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             {/* Logo - Desktop */}
             <div className="hidden md:flex items-center">
