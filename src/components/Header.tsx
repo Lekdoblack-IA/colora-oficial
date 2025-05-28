@@ -4,15 +4,18 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { User, ChevronDown, LogOut, CreditCard, Coins, Home, LayoutDashboard } from "lucide-react";
 import { AuthModal } from './AuthModal';
+import { BuyCreditsModal } from './dashboard/BuyCreditsModal';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 
 interface HeaderProps {
   userCredits?: number;
+  onCreditsAdded?: (credits: number) => void;
 }
 
-const Header = ({ userCredits = 5 }: HeaderProps) => {
+const Header = ({ userCredits = 5, onCreditsAdded }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isBuyCreditsOpen, setIsBuyCreditsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true); // Simulando usuário logado no dashboard
   const [userEmail] = useState("usuario@exemplo.com"); // Mock do email do usuário
   const navigate = useNavigate();
@@ -42,8 +45,14 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
   };
 
   const handleBuyCredits = () => {
-    // Esta função será conectada ao modal de comprar créditos
-    console.log('Abrir modal de comprar créditos');
+    setIsBuyCreditsOpen(true);
+  };
+
+  const handleCreditsAdded = (credits: number) => {
+    setIsBuyCreditsOpen(false);
+    if (onCreditsAdded) {
+      onCreditsAdded(credits);
+    }
   };
 
   const handleInicio = () => {
@@ -183,6 +192,13 @@ const Header = ({ userCredits = 5 }: HeaderProps) => {
       </header>
 
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onLogin={handleLogin} />
+      
+      <BuyCreditsModal 
+        isOpen={isBuyCreditsOpen}
+        onClose={() => setIsBuyCreditsOpen(false)}
+        onCreditsAdded={handleCreditsAdded}
+        currentCredits={userCredits}
+      />
     </>;
 };
 
