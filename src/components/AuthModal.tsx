@@ -61,7 +61,7 @@ export const AuthModal = ({
 
         <div className="p-6">
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-100 rounded-2xl p-1">
+            <TabsList className="grid w-full grid-cols-3 rounded-2xl p-1 bg-gray-100/55">
               <TabsTrigger value="login" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm">
                 Entrar
               </TabsTrigger>
@@ -98,14 +98,14 @@ export const AuthModal = ({
                   <Label htmlFor="email" className="text-gray-700 font-medium">E-mail</Label>
                   <div className="relative mt-1">
                     <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" className="pl-10 h-12 rounded-2xl border-gray-200 focus:border-pink-500 focus:ring-pink-500" />
+                    <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" className="pl-10 h-12 rounded-2xl border-gray-200 focus:border-white-500 focus:ring-pink-500 bg-gray-100/55" />
                   </div>
                 </div>
                 <div className="relative">
                   <Label htmlFor="password" className="text-gray-700 font-medium">Senha</Label>
                   <div className="relative mt-1">
                     <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="pl-10 pr-10 h-12 rounded-2xl border-gray-200 focus:border-pink-500 focus:ring-pink-500" />
+                    <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="pl-10 pr-10 h-12 rounded-2xl border-gray-200 focus:border-whinte-500 focus:ring-pink-500 bg-gray-100/55" />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
