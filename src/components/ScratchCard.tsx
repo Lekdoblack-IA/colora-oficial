@@ -2,11 +2,26 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  size: number;
+}
+
 const ScratchCard = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particleCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isScratching, setIsScratching] = useState(false);
   const [scratchPercentage, setScratchPercentage] = useState(0);
   const [showButton, setShowButton] = useState(false);
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const animationRef = useRef<number>();
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -64,6 +79,95 @@ const ScratchCard = () => {
     };
     img.src = '/lovable-uploads/955a3ce1-0cb0-4025-88e3-e2fca7f934dc.png';
   }, []);
+
+  useEffect(() => {
+    const particleCanvas = particleCanvasRef.current;
+    if (!particleCanvas) return;
+
+    const rect = particleCanvas.getBoundingClientRect();
+    particleCanvas.width = rect.width * window.devicePixelRatio;
+    particleCanvas.height = rect.height * window.devicePixelRatio;
+    const ctx = particleCanvas.getContext('2d');
+    if (ctx) {
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+  }, []);
+
+  useEffect(() => {
+    const animateParticles = () => {
+      const particleCanvas = particleCanvasRef.current;
+      if (!particleCanvas) return;
+      
+      const ctx = particleCanvas.getContext('2d');
+      if (!ctx) return;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, particleCanvas.offsetWidth, particleCanvas.offsetHeight);
+
+      setParticles(prevParticles => {
+        return prevParticles
+          .map(particle => ({
+            ...particle,
+            x: particle.x + particle.vx,
+            y: particle.y + particle.vy,
+            life: particle.life - 1,
+            vy: particle.vy + 0.1, // gravity
+          }))
+          .filter(particle => particle.life > 0);
+      });
+
+      // Draw particles
+      particles.forEach(particle => {
+        const alpha = particle.life / particle.maxLife;
+        const size = particle.size * alpha;
+        
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = `hsl(${45 + Math.random() * 30}, 100%, ${70 + Math.random() * 30}%)`;
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+        ctx.shadowBlur = 4;
+        
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      if (particles.length > 0 || isScratching) {
+        animationRef.current = requestAnimationFrame(animateParticles);
+      }
+    };
+
+    if (particles.length > 0 || isScratching) {
+      animationRef.current = requestAnimationFrame(animateParticles);
+    }
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [particles, isScratching]);
+
+  const createParticles = (x: number, y: number) => {
+    const newParticles: Particle[] = [];
+    const particleCount = 3 + Math.random() * 3; // 3-6 particles
+
+    for (let i = 0; i < particleCount; i++) {
+      newParticles.push({
+        x: x + (Math.random() - 0.5) * 20,
+        y: y + (Math.random() - 0.5) * 20,
+        vx: (Math.random() - 0.5) * 4,
+        vy: (Math.random() - 0.5) * 4 - 2,
+        life: 30 + Math.random() * 20,
+        maxLife: 30 + Math.random() * 20,
+        size: 2 + Math.random() * 3,
+      });
+    }
+
+    setParticles(prev => [...prev, ...newParticles]);
+  };
+
   const getEventPosition = (e: React.MouseEvent | React.TouchEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return {
@@ -78,11 +182,13 @@ const ScratchCard = () => {
       y: clientY - rect.top
     };
   };
+
   const startScratch = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     setIsScratching(true);
     scratch(e);
   };
+
   const scratch = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isScratching) return;
     const canvas = canvasRef.current;
@@ -93,6 +199,10 @@ const ScratchCard = () => {
       x,
       y
     } = getEventPosition(e);
+
+    // Create particles at scratch position
+    createParticles(x, y);
+
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
     // Tamanho do pincel responsivo para mobile
@@ -114,9 +224,11 @@ const ScratchCard = () => {
       setShowButton(true);
     }
   };
+
   const endScratch = () => {
     setIsScratching(false);
   };
+
   return <div className="w-full max-w-sm mx-auto">
       <AspectRatio ratio={4 / 5}>
         <div className="relative w-full h-full rounded-3xl overflow-hidden border border-gray-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:border-transparent hover:-translate-y-1">
@@ -133,8 +245,15 @@ const ScratchCard = () => {
           touchAction: 'none'
         }} />
 
+          {/* Canvas de partículas */}
+          <canvas 
+            ref={particleCanvasRef} 
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            style={{ zIndex: 10 }}
+          />
+
           {/* Botão flutuante */}
-          {showButton && <div className="absolute inset-0 flex items-center justify-center animate-fade-in-up p-6">
+          {showButton && <div className="absolute inset-0 flex items-center justify-center animate-fade-in-up p-6" style={{ zIndex: 20 }}>
               <Button className="bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base rounded-full shadow-lg animate-pulse-heart">
                 <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 <span className="text-xs sm:text-sm">Transforme agora ✨</span>
@@ -144,4 +263,5 @@ const ScratchCard = () => {
       </AspectRatio>
     </div>;
 };
+
 export default ScratchCard;
