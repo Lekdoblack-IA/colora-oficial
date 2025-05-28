@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
@@ -185,6 +185,10 @@ export const BuyCreditsModal = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg border-0 p-0">
+        <DialogTitle className="sr-only">Comprar Créditos</DialogTitle>
+        <DialogDescription className="sr-only">
+          Modal para escolher e comprar pacotes de créditos para desbloquear imagens
+        </DialogDescription>
         <ModalContent />
       </DialogContent>
     </Dialog>

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { DashboardHowItWorks } from '@/components/dashboard/DashboardHowItWorks';
 import { CreditsCounter } from '@/components/dashboard/CreditsCounter';
 import { TransformImageSection } from '@/components/dashboard/TransformImageSection';
@@ -106,18 +107,19 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header: Logo, "Inicio","Minha Conta (Dropdown)" */}
       <Header />
       
-      <main className="pt-24">
+      <main className="pt-24 flex-1">
         <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
-          {/* Como Funciona Simplificado */}
+          {/* Seção "Como Funciona" (Simplificada Em 3 passos) */}
           <DashboardHowItWorks />
           
-          {/* Contador de Créditos */}
+          {/* Contador De Créditos */}
           <CreditsCounter credits={userCredits} />
           
-          {/* Transformar Nova Imagem */}
+          {/* Seção "Transformar Nova Imagem" */}
           <TransformImageSection 
             onImageTransformed={handleImageTransformed}
             isProcessing={isProcessing}
@@ -125,7 +127,7 @@ const Dashboard = () => {
             canTransform={canTransformNewImage()}
           />
           
-          {/* Suas Imagens */}
+          {/* Seção "Suas Imagens" */}
           <UserImagesGallery 
             images={userImages}
             onUnlockImage={handleUnlockImage}
@@ -134,7 +136,10 @@ const Dashboard = () => {
         </div>
       </main>
 
-      {/* Modal de Compra de Créditos */}
+      {/* Footer */}
+      <Footer />
+
+      {/* Modal "Comprar Créditos" */}
       <BuyCreditsModal 
         isOpen={showBuyCreditsModal}
         onClose={() => {
