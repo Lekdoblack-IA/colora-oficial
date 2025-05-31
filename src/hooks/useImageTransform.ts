@@ -1,8 +1,11 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { sendImageToN8N } from '@/utils/n8nWebhook';
 
 const processingMessages = [
+  "Enviando sua imagem para processamento...",
   "Preparando sua imagem com cuidado...",
   "Removendo distrações do fundo...",
   "Detectando formas, rostos e detalhes...",
@@ -24,6 +27,7 @@ export const useImageTransform = (
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleFileSelect = (file: File) => {
     if (file.size > 15 * 1024 * 1024) { // 15MB
@@ -63,7 +67,37 @@ export const useImageTransform = (
     setIsProcessing(true);
     setCurrentMessageIndex(0);
 
-    // Simular progresso das mensagens
+    // Enviar imagem para N8N primeiro
+    try {
+      const webhookSuccess = await sendImageToN8N({
+        imageFile: selectedImage,
+        userId: user?.id,
+        fileName: selectedImage.name,
+        createdAt: new Date().toISOString()
+      });
+
+      if (webhookSuccess) {
+        toast({
+          title: "Imagem enviada para processamento!",
+          description: "Sua imagem está sendo transformada pelo nosso sistema.",
+        });
+      } else {
+        toast({
+          title: "Aviso",
+          description: "Houve um problema ao enviar para o processamento, mas continuaremos com a simulação.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Erro no webhook N8N:', error);
+      toast({
+        title: "Aviso",
+        description: "Problema na comunicação com o servidor de processamento.",
+        variant: "destructive"
+      });
+    }
+
+    // Continuar com o fluxo de simulação atual
     const messageInterval = setInterval(() => {
       setCurrentMessageIndex(prev => {
         if (prev >= processingMessages.length - 1) {
