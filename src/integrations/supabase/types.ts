@@ -9,6 +9,89 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      gallery_images: {
+        Row: {
+          created_at: string | null
+          deleted_by_system: boolean | null
+          expires_at: string | null
+          id: string
+          model_version: string
+          sketch_filename: string
+          sketch_image_url: string
+          status: string | null
+          unlocked: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          deleted_by_system?: boolean | null
+          expires_at?: string | null
+          id?: string
+          model_version: string
+          sketch_filename: string
+          sketch_image_url: string
+          status?: string | null
+          unlocked?: boolean | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          deleted_by_system?: boolean | null
+          expires_at?: string | null
+          id?: string
+          model_version?: string
+          sketch_filename?: string
+          sketch_image_url?: string
+          status?: string | null
+          unlocked?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_gallery_user"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plans: {
+        Row: {
+          created_at: string
+          credits: number
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          price_brl: number
+          price_cents: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          credits: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          price_brl: number
+          price_cents: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          credits?: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_brl?: number
+          price_cents?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           auth_provider: Database["public"]["Enums"]["auth_provider_type"]
@@ -65,6 +148,63 @@ export type Database = {
           verified_email?: boolean | null
         }
         Relationships: []
+      }
+      purchases: {
+        Row: {
+          amount_paid_brl: number
+          amount_paid_cents: number
+          credits_purchased: number
+          id: string
+          payment_method: string | null
+          payment_reference: string | null
+          payment_status: string
+          plan_id: string
+          processed_at: string | null
+          purchased_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_paid_brl: number
+          amount_paid_cents: number
+          credits_purchased: number
+          id?: string
+          payment_method?: string | null
+          payment_reference?: string | null
+          payment_status?: string
+          plan_id: string
+          processed_at?: string | null
+          purchased_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_paid_brl?: number
+          amount_paid_cents?: number
+          credits_purchased?: number
+          id?: string
+          payment_method?: string | null
+          payment_reference?: string | null
+          payment_status?: string
+          plan_id?: string
+          processed_at?: string | null
+          purchased_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

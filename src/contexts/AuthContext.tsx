@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -100,34 +101,68 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // Configurar listeners de autenticação
   useEffect(() => {
+    let mounted = true;
+
     // Configurar listener de mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session);
+        
+        if (!mounted) return;
+
         setSession(session);
         
-        if (session?.user) {
-          // Buscar perfil do usuário
-          const userProfile = await fetchUserProfile(session.user.id);
-          setUser(userProfile);
+        if (session?.user && event !== 'TOKEN_REFRESHED') {
+          // Usar setTimeout para evitar deadlock no callback
+          setTimeout(async () => {
+            if (mounted) {
+              const userProfile = await fetchUserProfile(session.user.id);
+              if (mounted) {
+                setUser(userProfile);
+                setIsLoading(false);
+              }
+            }
+          }, 0);
         } else {
           setUser(null);
+          setIsLoading(false);
         }
-        
-        setIsLoading(false);
       }
     );
 
     // Verificar sessão inicial
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setSession(session);
-        fetchUserProfile(session.user.id).then(setUser);
-      }
-      setIsLoading(false);
-    });
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Erro ao obter sessão:', error);
+          setIsLoading(false);
+          return;
+        }
 
-    return () => subscription.unsubscribe();
+        if (currentSession && mounted) {
+          setSession(currentSession);
+          const userProfile = await fetchUserProfile(currentSession.user.id);
+          if (mounted) {
+            setUser(userProfile);
+          }
+        }
+      } catch (error) {
+        console.error('Erro na inicialização da auth:', error);
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -142,14 +177,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         throw new Error(error.message);
       }
 
-      if (data.user) {
-        const userProfile = await fetchUserProfile(data.user.id);
-        setUser(userProfile);
-      }
+      // O listener de auth vai lidar com a atualização do usuário
+      console.log('Login realizado com sucesso:', data);
     } catch (error) {
-      throw error;
-    } finally {
       setIsLoading(false);
+      throw error;
     }
   };
 
@@ -168,18 +200,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         throw new Error(error.message);
       }
 
-      // Se o usuário foi criado com sucesso, buscar o perfil
-      if (data.user) {
-        // Aguardar um pouco para o trigger criar o perfil
-        setTimeout(async () => {
-          const userProfile = await fetchUserProfile(data.user!.id);
-          setUser(userProfile);
-        }, 1000);
-      }
+      console.log('Registro realizado com sucesso:', data);
+      // O listener de auth vai lidar com a atualização do usuário
     } catch (error) {
-      throw error;
-    } finally {
       setIsLoading(false);
+      throw error;
     }
   };
 
