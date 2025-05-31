@@ -34,7 +34,7 @@ export const sendImageToN8N = async ({
     }
 
     console.log('Enviando imagem para N8N:', {
-      fileName: imageFile.name,
+      originalFileName: imageFile.name,
       size: imageFile.size,
       type: imageFile.type,
       userId,
