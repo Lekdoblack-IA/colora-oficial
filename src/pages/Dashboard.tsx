@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -7,40 +8,37 @@ import { TransformImageSection } from '@/components/dashboard/TransformImageSect
 import { UserImagesGallery } from '@/components/dashboard/UserImagesGallery';
 import { BuyCreditsModal } from '@/components/dashboard/BuyCreditsModal';
 import { useToast } from '@/hooks/use-toast';
-
-interface UserImage {
-  id: string;
-  originalUrl: string;
-  transformedUrl: string;
-  isUnlocked: boolean;
-  createdAt: Date;
-  expiresAt?: Date;
-}
+import { useUserGallery } from '@/hooks/useUserGallery';
 
 const Dashboard = () => {
   const { user, logout, updateCredits } = useAuth();
-  const [userImages, setUserImages] = useState<UserImage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showBuyCreditsModal, setShowBuyCreditsModal] = useState(false);
   const [selectedImageToUnlock, setSelectedImageToUnlock] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleImageTransformed = (originalUrl: string, transformedUrl: string) => {
-    const newImage: UserImage = {
-      id: Date.now().toString(),
-      originalUrl,
-      transformedUrl,
-      isUnlocked: false,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000) // 2 horas
-    };
+  // Use real gallery data from Supabase
+  const {
+    images: userImages,
+    isLoading: isLoadingImages,
+    unlockImage,
+    deleteImage,
+    isImageExpired,
+    refetch: refetchImages
+  } = useUserGallery();
 
-    setUserImages(prev => [newImage, ...prev]);
-    
+  const handleImageTransformed = () => {
+    // After successful N8N processing, just show success message
+    // The image will appear automatically when N8N saves to Supabase
     toast({
-      title: "Imagem transformada com sucesso!",
-      description: "Sua imagem foi adicionada à galeria abaixo.",
+      title: "Imagem enviada com sucesso!",
+      description: "Sua imagem está sendo processada. Ela aparecerá aqui em breve.",
     });
+    
+    // Refetch images to show any new ones
+    setTimeout(() => {
+      refetchImages();
+    }, 2000);
   };
 
   const handleUnlockImage = (imageId: string) => {
@@ -50,28 +48,15 @@ const Dashboard = () => {
       return;
     }
 
+    // Update user credits first
     updateCredits(user.credits - 1);
-    setUserImages(prev => 
-      prev.map(img => 
-        img.id === imageId 
-          ? { ...img, isUnlocked: true, expiresAt: undefined }
-          : img
-      )
-    );
-
-    toast({
-      title: "Imagem desbloqueada!",
-      description: "Sua imagem está disponível para download.",
-    });
+    
+    // Then unlock the image in Supabase
+    unlockImage(imageId);
   };
 
   const handleDeleteImage = (imageId: string) => {
-    setUserImages(prev => prev.filter(img => img.id !== imageId));
-    
-    toast({
-      title: "Imagem excluída",
-      description: "A imagem expirada foi removida do seu histórico.",
-    });
+    deleteImage(imageId);
   };
 
   const handleCreditsAdded = (credits: number) => {
@@ -80,7 +65,7 @@ const Dashboard = () => {
     }
     setShowBuyCreditsModal(false);
     
-    // Se havia uma imagem selecionada para desbloquear, desbloqueie automaticamente
+    // If there was an image selected for unlocking, unlock it automatically
     if (selectedImageToUnlock && user) {
       handleUnlockImage(selectedImageToUnlock);
       setSelectedImageToUnlock(null);
@@ -95,10 +80,6 @@ const Dashboard = () => {
   const canTransformNewImage = () => {
     const unlockedImages = userImages.filter(img => !img.isUnlocked && !isImageExpired(img));
     return unlockedImages.length < 2;
-  };
-
-  const isImageExpired = (image: UserImage) => {
-    return image.expiresAt && new Date() > image.expiresAt;
   };
 
   return (
@@ -124,6 +105,7 @@ const Dashboard = () => {
             onUnlockImage={handleUnlockImage}
             onDeleteImage={handleDeleteImage}
             isImageExpired={isImageExpired}
+            isLoading={isLoadingImages}
           />
         </div>
       </main>

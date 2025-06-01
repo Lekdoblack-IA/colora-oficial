@@ -19,7 +19,7 @@ const processingMessages = [
 ];
 
 export const useImageTransform = (
-  onImageTransformed: (originalUrl: string, transformedUrl: string) => void,
+  onImageTransformed: () => void,
   isProcessing: boolean,
   setIsProcessing: (processing: boolean) => void
 ) => {
@@ -67,37 +67,7 @@ export const useImageTransform = (
     setIsProcessing(true);
     setCurrentMessageIndex(0);
 
-    // Enviar imagem para N8N primeiro
-    try {
-      const webhookSuccess = await sendImageToN8N({
-        imageFile: selectedImage,
-        userId: user?.id,
-        fileName: selectedImage.name,
-        createdAt: new Date().toISOString()
-      });
-
-      if (webhookSuccess) {
-        toast({
-          title: "Imagem enviada para processamento!",
-          description: "Sua imagem está sendo transformada pelo nosso sistema.",
-        });
-      } else {
-        toast({
-          title: "Aviso",
-          description: "Houve um problema ao enviar para o processamento, mas continuaremos com a simulação.",
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      console.error('Erro no webhook N8N:', error);
-      toast({
-        title: "Aviso",
-        description: "Problema na comunicação com o servidor de processamento.",
-        variant: "destructive"
-      });
-    }
-
-    // Continuar com o fluxo de simulação atual
+    // Start the message progression
     const messageInterval = setInterval(() => {
       setCurrentMessageIndex(prev => {
         if (prev >= processingMessages.length - 1) {
@@ -106,24 +76,47 @@ export const useImageTransform = (
         }
         return prev + 1;
       });
-    }, 2500);
+    }, 2000);
 
-    // Simular processamento
-    setTimeout(() => {
+    try {
+      // Send image to N8N for processing
+      const webhookSuccess = await sendImageToN8N({
+        imageFile: selectedImage,
+        userId: user?.id,
+        fileName: selectedImage.name,
+        createdAt: new Date().toISOString()
+      });
+
+      if (webhookSuccess) {
+        // Show success message after processing animation
+        setTimeout(() => {
+          clearInterval(messageInterval);
+          setIsProcessing(false);
+          handleCancel();
+          
+          onImageTransformed();
+        }, processingMessages.length * 2000);
+      } else {
+        clearInterval(messageInterval);
+        setIsProcessing(false);
+        
+        toast({
+          title: "Erro no processamento",
+          description: "Houve um problema ao processar sua imagem. Tente novamente.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Erro no processamento:', error);
       clearInterval(messageInterval);
-      
-      // Simular URL da imagem transformada
-      const transformedUrl = "/lovable-uploads/8b435186-61a8-4d54-a916-c037e2abd2f6.png";
-      
-      onImageTransformed(previewUrl, transformedUrl);
       setIsProcessing(false);
-      handleCancel();
       
       toast({
-        title: "Sua imagem está pronta!",
-        description: "Sua imagem foi adicionada à galeria! Redirecionando automaticamente...",
+        title: "Erro no processamento",
+        description: "Houve um problema ao processar sua imagem. Tente novamente.",
+        variant: "destructive"
       });
-    }, processingMessages.length * 2500);
+    }
   };
 
   return {

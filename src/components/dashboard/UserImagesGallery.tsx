@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Download } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ImageCard } from './gallery/ImageCard';
 
@@ -18,13 +18,15 @@ interface UserImagesGalleryProps {
   onUnlockImage: (imageId: string) => void;
   onDeleteImage: (imageId: string) => void;
   isImageExpired: (image: UserImage) => boolean;
+  isLoading?: boolean;
 }
 
 export const UserImagesGallery = ({
   images,
   onUnlockImage,
   onDeleteImage,
-  isImageExpired
+  isImageExpired,
+  isLoading = false
 }: UserImagesGalleryProps) => {
   const [confirmingUnlock, setConfirmingUnlock] = useState<string | null>(null);
 
@@ -40,6 +42,35 @@ export const UserImagesGallery = ({
       }, 5000);
     }
   };
+
+  if (isLoading) {
+    return (
+      <section className="bg-white rounded-2xl p-4 md:p-8 shadow-sm">
+        <div className="text-center">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 cursor-help">
+                  Suas Imagens
+                </h2>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Gaste 1 Crédito para Desbloquear imagem pra Download</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <div className="py-8 md:py-12">
+            <div className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+              <Loader2 className="w-6 h-6 md:w-8 md:h-8 text-gray-400 animate-spin" />
+            </div>
+            <p className="text-sm md:text-base text-gray-600">
+              Carregando suas imagens...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (images.length === 0) {
     return (

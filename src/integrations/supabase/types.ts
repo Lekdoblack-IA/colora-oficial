@@ -14,10 +14,10 @@ export type Database = {
           created_at: string | null
           deleted_by_system: boolean | null
           expires_at: string | null
+          filename: string
           id: string
+          image_url: string
           model_version: string
-          sketch_filename: string
-          sketch_image_url: string
           status: string | null
           unlocked: boolean | null
           user_id: string
@@ -26,10 +26,10 @@ export type Database = {
           created_at?: string | null
           deleted_by_system?: boolean | null
           expires_at?: string | null
+          filename: string
           id?: string
+          image_url: string
           model_version: string
-          sketch_filename: string
-          sketch_image_url: string
           status?: string | null
           unlocked?: boolean | null
           user_id: string
@@ -38,10 +38,10 @@ export type Database = {
           created_at?: string | null
           deleted_by_system?: boolean | null
           expires_at?: string | null
+          filename?: string
           id?: string
+          image_url?: string
           model_version?: string
-          sketch_filename?: string
-          sketch_image_url?: string
           status?: string | null
           unlocked?: boolean | null
           user_id?: string
