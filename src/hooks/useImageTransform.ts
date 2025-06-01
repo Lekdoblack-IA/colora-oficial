@@ -30,6 +30,8 @@ export const useImageTransform = (
   const { user } = useAuth();
 
   const handleFileSelect = (file: File) => {
+    console.log('Arquivo selecionado:', file.name, file.size, file.type);
+    
     if (file.size > 15 * 1024 * 1024) { // 15MB
       toast({
         title: "Arquivo muito grande",
@@ -51,9 +53,11 @@ export const useImageTransform = (
     setSelectedImage(file);
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
+    console.log('Preview URL criada:', url);
   };
 
   const handleCancel = () => {
+    console.log('Cancelando seleção de imagem');
     setSelectedImage(null);
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
@@ -62,41 +66,75 @@ export const useImageTransform = (
   };
 
   const handleTransform = async () => {
-    if (!selectedImage || !previewUrl) return;
+    if (!selectedImage || !previewUrl) {
+      console.error('Nenhuma imagem selecionada para transformar');
+      toast({
+        title: "Erro",
+        description: "Nenhuma imagem selecionada.",
+        variant: "destructive"
+      });
+      return;
+    }
 
+    if (!user?.id) {
+      console.error('Usuário não autenticado');
+      toast({
+        title: "Erro de autenticação",
+        description: "Você precisa estar logado para transformar imagens.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    console.log('Iniciando transformação da imagem:', selectedImage.name);
     setIsProcessing(true);
     setCurrentMessageIndex(0);
 
     // Start the message progression
     const messageInterval = setInterval(() => {
       setCurrentMessageIndex(prev => {
-        if (prev >= processingMessages.length - 1) {
+        const nextIndex = prev + 1;
+        console.log('Progresso da mensagem:', nextIndex, '/', processingMessages.length);
+        if (nextIndex >= processingMessages.length - 1) {
           clearInterval(messageInterval);
-          return prev;
+          return processingMessages.length - 1;
         }
-        return prev + 1;
+        return nextIndex;
       });
     }, 2000);
 
     try {
+      console.log('Enviando imagem para N8N...');
+      
       // Send image to N8N for processing
       const webhookSuccess = await sendImageToN8N({
         imageFile: selectedImage,
-        userId: user?.id,
+        userId: user.id,
         fileName: selectedImage.name,
         createdAt: new Date().toISOString()
       });
 
+      console.log('Resultado do webhook N8N:', webhookSuccess);
+
       if (webhookSuccess) {
-        // Show success message after processing animation
+        // Show success message after processing animation completes
+        const remainingTime = (processingMessages.length - currentMessageIndex) * 2000;
+        
         setTimeout(() => {
+          console.log('Finalizando processamento com sucesso');
           clearInterval(messageInterval);
           setIsProcessing(false);
           handleCancel();
           
+          toast({
+            title: "Imagem enviada com sucesso!",
+            description: "Sua imagem está sendo processada. Ela aparecerá aqui em breve.",
+          });
+          
           onImageTransformed();
-        }, processingMessages.length * 2000);
+        }, remainingTime);
       } else {
+        console.error('Falha no envio para N8N');
         clearInterval(messageInterval);
         setIsProcessing(false);
         
@@ -107,7 +145,7 @@ export const useImageTransform = (
         });
       }
     } catch (error) {
-      console.error('Erro no processamento:', error);
+      console.error('Erro no processamento da imagem:', error);
       clearInterval(messageInterval);
       setIsProcessing(false);
       

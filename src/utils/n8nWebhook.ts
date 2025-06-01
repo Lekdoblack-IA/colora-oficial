@@ -1,6 +1,4 @@
 
-import { useToast } from '@/hooks/use-toast';
-
 interface SendImageToN8NParams {
   imageFile: File;
   userId?: string;
@@ -15,6 +13,8 @@ export const sendImageToN8N = async ({
   createdAt
 }: SendImageToN8NParams): Promise<boolean> => {
   try {
+    console.log('Preparando envio para N8N...');
+    
     const formData = new FormData();
     
     // Campo obrigatório: imagem como arquivo binário
@@ -47,14 +47,26 @@ export const sendImageToN8N = async ({
       body: formData,
     });
 
+    console.log('Resposta do N8N - Status:', response.status);
+    console.log('Resposta do N8N - Headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text().catch(() => 'Sem detalhes do erro');
+      console.error('Erro HTTP do N8N:', response.status, errorText);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
     }
 
-    console.log('Imagem enviada com sucesso para N8N:', response.status);
+    const responseText = await response.text().catch(() => '');
+    console.log('Resposta do N8N - Body:', responseText);
+    
+    console.log('Imagem enviada com sucesso para N8N');
     return true;
   } catch (error) {
-    console.error('Erro ao enviar imagem para N8N:', error);
+    console.error('Erro detalhado ao enviar imagem para N8N:', {
+      message: error instanceof Error ? error.message : 'Erro desconhecido',
+      stack: error instanceof Error ? error.stack : undefined,
+      error
+    });
     return false;
   }
 };
