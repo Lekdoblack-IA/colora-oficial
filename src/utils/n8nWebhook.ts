@@ -42,7 +42,7 @@ export const sendImageToN8N = async ({
       createdAt
     });
 
-    const response = await fetch('https://n8n.srv845529.hstgr.cloud/webhook-test/receber-imagem', {
+    const response = await fetch('https://n8n.srv845529.hstgr.cloud/webhook/receber-imagem', {
       method: 'POST',
       body: formData,
     });
