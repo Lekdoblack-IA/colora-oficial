@@ -15,6 +15,8 @@ const processingMessages = [
   "Equilibrando luz, sombra e espaços vazios...",
   "Gerando textura suave como papel...",
   "Compactando em alta qualidade pra impressão...",
+  "Finalizando os últimos detalhes...",
+  "Processamento quase concluído...",
   "Sua arte está pronta pra colorir."
 ];
 
@@ -90,7 +92,7 @@ export const useImageTransform = (
     setIsProcessing(true);
     setCurrentMessageIndex(0);
 
-    // Start the message progression
+    // Start the message progression with slower timing for longer processing
     const messageInterval = setInterval(() => {
       setCurrentMessageIndex(prev => {
         const nextIndex = prev + 1;
@@ -101,7 +103,7 @@ export const useImageTransform = (
         }
         return nextIndex;
       });
-    }, 2000);
+    }, 3000); // Increased from 2000 to 3000ms for longer total time
 
     try {
       console.log('Enviando imagem para N8N...');
@@ -117,8 +119,12 @@ export const useImageTransform = (
       console.log('Resultado do webhook N8N:', webhookSuccess);
 
       if (webhookSuccess) {
-        // Show success message after processing animation completes
-        const remainingTime = (processingMessages.length - currentMessageIndex) * 2000;
+        // Wait longer for processing - let the messages complete plus additional time
+        const totalProcessingTime = processingMessages.length * 3000; // 39 seconds total
+        const additionalWaitTime = 20000; // Additional 20 seconds for N8N processing
+        const totalWaitTime = Math.max(totalProcessingTime, additionalWaitTime);
+        
+        console.log(`Aguardando processamento completo por ${totalWaitTime}ms`);
         
         setTimeout(() => {
           console.log('Finalizando processamento com sucesso');
@@ -127,12 +133,20 @@ export const useImageTransform = (
           handleCancel();
           
           toast({
-            title: "Imagem enviada com sucesso!",
-            description: "Sua imagem está sendo processada. Ela aparecerá aqui em breve.",
+            title: "Imagem processada com sucesso!",
+            description: "Sua imagem foi transformada e aparecerá na galeria em instantes.",
           });
           
+          // Call the callback to refresh the gallery
           onImageTransformed();
-        }, remainingTime);
+          
+          // Also trigger a delayed refresh to ensure we get the new image
+          setTimeout(() => {
+            console.log('Executando refresh adicional da galeria');
+            onImageTransformed();
+          }, 5000);
+          
+        }, totalWaitTime);
       } else {
         console.error('Falha no envio para N8N');
         clearInterval(messageInterval);

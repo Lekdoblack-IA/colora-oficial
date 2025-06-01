@@ -31,7 +31,7 @@ export const useUserGallery = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch user's gallery images
+  // Fetch user's gallery images with more frequent refetching
   const {
     data: images = [],
     isLoading,
@@ -41,6 +41,8 @@ export const useUserGallery = () => {
     queryKey: ['userGallery', user?.id],
     queryFn: async (): Promise<UserImage[]> => {
       if (!user?.id) return [];
+
+      console.log('Buscando imagens do usuário:', user.id);
 
       const { data, error } = await supabase
         .from('gallery_images')
@@ -54,6 +56,8 @@ export const useUserGallery = () => {
         throw new Error('Erro ao carregar suas imagens');
       }
 
+      console.log('Imagens encontradas:', data?.length || 0);
+
       // Map Supabase data to UserImage interface
       return data.map((img: GalleryImage): UserImage => ({
         id: img.id,
@@ -65,6 +69,8 @@ export const useUserGallery = () => {
       }));
     },
     enabled: !!user?.id,
+    refetchInterval: 15000, // Refetch every 15 seconds
+    staleTime: 5000, // Data is considered stale after 5 seconds
   });
 
   // Unlock image mutation

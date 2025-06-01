@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -27,18 +27,39 @@ const Dashboard = () => {
     refetch: refetchImages
   } = useUserGallery();
 
+  // Auto-refresh gallery every 10 seconds when not processing
+  useEffect(() => {
+    if (!isProcessing) {
+      const interval = setInterval(() => {
+        console.log('Auto-refresh da galeria executado');
+        refetchImages();
+      }, 10000); // 10 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [isProcessing, refetchImages]);
+
   const handleImageTransformed = () => {
-    // After successful N8N processing, just show success message
-    // The image will appear automatically when N8N saves to Supabase
-    toast({
-      title: "Imagem enviada com sucesso!",
-      description: "Sua imagem está sendo processada. Ela aparecerá aqui em breve.",
-    });
+    console.log('handleImageTransformed chamado - atualizando galeria');
     
-    // Refetch images to show any new ones
+    // Immediate refresh
+    refetchImages();
+    
+    // Additional refreshes to ensure we capture the new image
     setTimeout(() => {
+      console.log('Refresh adicional 1 executado');
       refetchImages();
-    }, 2000);
+    }, 5000);
+    
+    setTimeout(() => {
+      console.log('Refresh adicional 2 executado');
+      refetchImages();
+    }, 15000);
+    
+    setTimeout(() => {
+      console.log('Refresh adicional 3 executado');
+      refetchImages();
+    }, 30000);
   };
 
   const handleUnlockImage = (imageId: string) => {
