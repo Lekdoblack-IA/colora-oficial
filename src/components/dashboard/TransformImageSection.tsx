@@ -6,7 +6,7 @@ import { ImagePreview } from './ImagePreview';
 import { LimitReachedState } from './LimitReachedState';
 
 interface TransformImageSectionProps {
-  onImageTransformed: (originalUrl: string, transformedUrl: string) => void;
+  onImageTransformed: () => void;
   isProcessing: boolean;
   setIsProcessing: (processing: boolean) => void;
   canTransform: boolean;
