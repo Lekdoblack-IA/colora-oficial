@@ -74,7 +74,7 @@ export const BuyCreditsModal = ({
     
     // Send webhook with user data
     try {
-      const response = await fetch('https://n8n.srv845529.hstgr.cloud/webhook/d8e707ae-093a-4e08-9069-8627eb9c1d19', {
+      const response = await fetch('https://n8n.srv845529.hstgr.cloud/webhook-test/d8e707ae-093a-4e08-9069-8627eb9c1d19', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
