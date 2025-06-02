@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,7 +41,7 @@ export const useSyncGalleryImages = () => {
 
         console.log(`Encontradas ${storageImages.length} imagens no Storage`);
 
-        // 2. Buscar registros existentes na tabela gallery_images - CORRIGIDO: incluir filename
+        // 2. Buscar registros existentes na tabela gallery_images - incluir filename
         const { data: dbImages, error: dbError } = await supabase
           .from('gallery_images')
           .select('image_url, filename')
@@ -92,34 +93,44 @@ export const useSyncGalleryImages = () => {
 
         // 4. Para cada imagem de colorir, verificar se já existe na tabela
         for (const img of coloringImages) {
-          // CORREÇÃO: Usar o nome real do arquivo do Storage ao invés de um nome genérico
-          const realFileName = img.name; // Usar o nome real do arquivo
+          // CORREÇÃO PRINCIPAL: Gerar um filename único para cada imagem
+          // Mesmo que venha com o mesmo nome do N8N, vamos torná-lo único
+          const originalFileName = img.name;
+          const timestamp = Date.now();
+          const randomSuffix = Math.random().toString(36).substring(2, 8);
+          const fileExtension = originalFileName.split('.').pop();
+          const baseFileName = originalFileName.split('.')[0];
           
-          // Construir URL pública correta para a imagem usando o nome real
-          const imageUrl = supabase.storage.from('user-gallery').getPublicUrl(realFileName).data.publicUrl;
+          // Criar um filename único combinando múltiplos fatores
+          const uniqueFileName = `${baseFileName}_${timestamp}_${randomSuffix}.${fileExtension}`;
           
-          // Verificar se a imagem já existe na tabela pelo nome do arquivo ou URL
-          const existsByName = existingFileNames.has(realFileName);
+          console.log(`Processando: ${originalFileName} -> ${uniqueFileName}`);
+          
+          // Construir URL pública usando o nome original do arquivo no Storage
+          const imageUrl = supabase.storage.from('user-gallery').getPublicUrl(originalFileName).data.publicUrl;
+          
+          // Verificar se já existe pelo nome original OU pela URL
+          const existsByOriginalName = existingFileNames.has(originalFileName);
           const existsByUrl = existingImageUrls.has(imageUrl);
-          const exists = existsByName || existsByUrl;
+          const exists = existsByOriginalName || existsByUrl;
           
-          console.log(`Verificando imagem ${realFileName}: existsByName=${existsByName}, existsByUrl=${existsByUrl}`);
+          console.log(`Verificando imagem ${originalFileName}: existsByName=${existsByOriginalName}, existsByUrl=${existsByUrl}`);
           
           if (!exists) {
-            console.log(`Sincronizando imagem ${realFileName} para o banco de dados`);
+            console.log(`Sincronizando imagem ${originalFileName} com filename único: ${uniqueFileName}`);
             
             try {
-              // Gerar um ID único para a imagem baseado no timestamp e nome do arquivo
-              const uniqueId = `${Date.now()}_${realFileName}`;
+              // Gerar um ID único para a imagem
+              const uniqueId = `${timestamp}_${randomSuffix}`;
               
-              // Inserir a imagem na tabela gallery_images usando o nome real do arquivo
+              // Inserir a imagem na tabela gallery_images com filename único
               const { data, error } = await supabase
                 .from('gallery_images')
                 .insert([
                   {
                     user_id: user?.id,
-                    image_url: imageUrl, // URL baseada no nome real do arquivo
-                    filename: realFileName, // Nome real do arquivo do Storage
+                    image_url: imageUrl, // URL baseada no nome original do arquivo no Storage
+                    filename: uniqueFileName, // Nome único gerado para evitar conflitos
                     model_version: 'v1',
                     created_at: new Date().toISOString(),
                     unlocked: false,
@@ -127,12 +138,13 @@ export const useSyncGalleryImages = () => {
                     expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
                     // Adicionar metadados para ajudar a identificar a imagem
                     metadata: {
-                      filename: realFileName, // Nome real do arquivo
+                      filename: uniqueFileName, // Nome único gerado
+                      original_filename: originalFileName, // Nome original do Storage
                       raw_url: imageUrl,
-                      cache_key: Date.now().toString(),
-                      generatedAt: Date.now(),
+                      cache_key: timestamp.toString(),
+                      generatedAt: timestamp,
                       uniqueId: uniqueId,
-                      sync_timestamp: Date.now(),
+                      sync_timestamp: timestamp,
                       url: imageUrl
                     }
                   }
@@ -142,7 +154,7 @@ export const useSyncGalleryImages = () => {
                 console.error('Erro ao inserir imagem na tabela:', error);
               } else {
                 console.log('Imagem sincronizada com sucesso:', data);
-                // Forçar invalidação do cache para atualizar a galeria - CORRIGIDO: usar objeto
+                // Forçar invalidação do cache para atualizar a galeria
                 await queryClient.invalidateQueries({ queryKey: ['userGallery'] });
                 newImagesAdded = true;
               }
@@ -150,7 +162,7 @@ export const useSyncGalleryImages = () => {
               console.error('Erro ao sincronizar imagem:', err);
             }
           } else {
-            console.log(`Imagem ${realFileName} já existe no banco de dados, pulando...`);
+            console.log(`Imagem ${originalFileName} já existe no banco de dados, pulando...`);
           }
         }
 
@@ -176,7 +188,7 @@ export const useSyncGalleryImages = () => {
     }, 5000);
 
     // Configurar intervalo para sincronização periódica
-    const syncInterval = setInterval(syncImages, 15000); // a cada 15 segundos (reduzido de 30s)
+    const syncInterval = setInterval(syncImages, 15000); // a cada 15 segundos
 
     return () => {
       clearInterval(syncInterval);
