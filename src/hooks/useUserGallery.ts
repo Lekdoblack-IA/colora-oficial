@@ -25,7 +25,7 @@ interface GalleryImage {
 export interface UserImage {
   id: string;
   originalUrl: string;
-  url: string; // URL com parâmetros anti-cache para exibição
+  url: string; // URL com ID único para exibição
   createdAt: string;
   unlocked: boolean;
   name: string;
@@ -81,47 +81,31 @@ export const useUserGallery = () => {
         });
       }
 
-      // Map Supabase data to UserImage interface com correção de URL
+      // Map Supabase data to UserImage interface usando ID único
       return (data || []).map((img: GalleryImage): UserImage => {
+        // USAR O ID DA IMAGEM COMO IDENTIFICADOR ÚNICO
+        // Ignorar completamente o filename duplicado e usar apenas o ID
+        
+        console.log(`Processando imagem ID: ${img.id} com filename: ${img.filename}`);
+        
+        // Construir URL usando o filename real do Storage, mas com ID único como parâmetro
         let finalImageUrl = '';
         let originalImageUrl = '';
         
-        // CORREÇÃO: Verificar se image_url já é uma URL válida e não duplicada
-        if (img.image_url && img.image_url.startsWith('http') && !img.image_url.includes('http://') && !img.image_url.includes('https://https://')) {
-          // URL já é válida e não está duplicada
-          finalImageUrl = img.image_url;
-          originalImageUrl = img.image_url;
-          console.log(`Usando URL direta válida para imagem ${img.id}: ${finalImageUrl}`);
+        if (img.filename) {
+          // Construir URL do Storage usando o filename
+          const { data: urlData } = supabase.storage.from('user-gallery').getPublicUrl(img.filename);
+          const baseUrl = urlData.publicUrl;
+          
+          // IMPORTANTE: Usar o ID da imagem como parâmetro único para diferenciar
+          // Isso garante que mesmo com filenames iguais, cada imagem terá uma URL única
+          finalImageUrl = `${baseUrl}?id=${img.id}&t=${sessionTimestamp}`;
+          originalImageUrl = `${baseUrl}?id=${img.id}`;
+          
+          console.log(`URL construída para imagem ${img.id}: ${finalImageUrl}`);
         } else {
-          // URL inválida ou duplicada, construir a partir do filename
-          if (img.filename) {
-            const { data: urlData } = supabase.storage.from('user-gallery').getPublicUrl(img.filename);
-            finalImageUrl = urlData.publicUrl;
-            originalImageUrl = urlData.publicUrl;
-            console.log(`URL construída a partir do filename para imagem ${img.id}: ${finalImageUrl}`);
-          } else {
-            // Último recurso: tentar extrair filename da URL corrompida
-            let extractedFilename = '';
-            if (img.image_url) {
-              // Procurar por padrões como "coloring_" ou "image_" na URL
-              const matches = img.image_url.match(/(coloring_\d+\.png|image_\d+_\w+\.\w+)/g);
-              if (matches && matches.length > 0) {
-                extractedFilename = matches[matches.length - 1]; // Pegar o último match (mais específico)
-              }
-            }
-            
-            if (extractedFilename) {
-              const { data: urlData } = supabase.storage.from('user-gallery').getPublicUrl(extractedFilename);
-              finalImageUrl = urlData.publicUrl;
-              originalImageUrl = urlData.publicUrl;
-              console.log(`URL construída a partir de filename extraído para imagem ${img.id}: ${finalImageUrl}`);
-            } else {
-              console.error(`Não foi possível construir URL para imagem ${img.id}`);
-              // Usar uma URL de fallback para evitar quebrar a aplicação
-              finalImageUrl = '';
-              originalImageUrl = '';
-            }
-          }
+          console.error(`Imagem ${img.id} não tem filename`);
+          return null;
         }
         
         // Pular imagens sem URL válida
@@ -130,25 +114,21 @@ export const useUserGallery = () => {
           return null;
         }
         
-        // Criar URL única para cache-busting usando o ID da imagem
-        const uniqueCacheKey = `${img.id}_${sessionTimestamp}`;
-        const displayUrl = `${finalImageUrl}?v=${uniqueCacheKey}`;
-        
-        console.log(`URL final para imagem ID: ${img.id}: ${displayUrl}`);
+        console.log(`URL final para imagem ID: ${img.id}: ${finalImageUrl}`);
         
         return {
           id: img.id,
-          originalUrl: finalImageUrl, // URL original limpa para download
-          url: displayUrl, // URL com cache-busting para exibição
+          originalUrl: originalImageUrl, // URL com ID único para download
+          url: finalImageUrl, // URL com ID e timestamp únicos para exibição
           createdAt: img.created_at,
           unlocked: img.unlocked === true,
-          name: img.filename || `imagem-${img.id}`,
+          name: `imagem-${img.id}`, // Nome único baseado no ID
           expiresAt: img.expires_at ? new Date(img.expires_at) : undefined,
           metadata: {
             filename: img.filename,
-            raw_url: finalImageUrl,
+            raw_url: originalImageUrl,
             image_id: img.id,
-            cache_key: uniqueCacheKey
+            cache_key: `${img.id}_${sessionTimestamp}`
           }
         };
       }).filter(Boolean) as UserImage[]; // Remover itens null
@@ -159,6 +139,7 @@ export const useUserGallery = () => {
     retry: 3,
   });
 
+  
   // Unlock image mutation
   const unlockImageMutation = useMutation({
     mutationFn: async (imageId: string) => {

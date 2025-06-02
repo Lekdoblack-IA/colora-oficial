@@ -1,11 +1,10 @@
+
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { ImageOverlay } from './ImageOverlay';
 import { ImageActions } from './ImageActions';
 import { TimeLeft } from './TimeLeft';
 import { useState, useEffect } from 'react';
 import { UserImage } from '@/hooks/useUserGallery';
-
-// Interface UserImage importada de @/hooks/useUserGallery
 
 interface ImageCardProps {
   image: UserImage;
@@ -26,77 +25,27 @@ export const ImageCard = ({
   const [imageUrl, setImageUrl] = useState<string>(image.url || '');
   const [imageError, setImageError] = useState(false);
   
-  // Inicializar a URL da imagem quando o componente é montado ou quando a imagem muda
+  // Usar diretamente a URL com ID único
   useEffect(() => {
-    // Usar diretamente a URL da imagem sem modificar
-    console.log(`Usando URL para imagem ${image.id}:`, image.url);
+    console.log(`Carregando imagem ID: ${image.id} com URL: ${image.url}`);
     
-    // Atualizar o estado com a URL
+    // Usar diretamente a URL que já contém o ID único
     setImageUrl(image.url);
-    setImageError(false); // Resetar o estado de erro
+    setImageError(false);
     
-    // Pré-carregar a imagem com a URL
+    // Pré-carregar a imagem
     const preloadImage = new Image();
     preloadImage.src = image.url;
     
     preloadImage.onload = () => {
-      console.log(`Imagem ID: ${image.id} pré-carregada com sucesso`);
+      console.log(`Imagem ID: ${image.id} carregada com sucesso`);
     };
     
     preloadImage.onerror = (error) => {
-      console.error(`Erro ao pré-carregar imagem ID: ${image.id}:`, error);
+      console.error(`Erro ao carregar imagem ID: ${image.id}:`, error);
       setImageError(true);
-      
-      // Tentar URL alternativa se a principal falhar
-      if (image.originalUrl) {
-        console.log(`Tentando URL original para imagem ${image.id}:`, image.originalUrl);
-        setImageUrl(image.originalUrl);
-      }
     };
-  }, [image.id, image.url, image.originalUrl]); // Depender do ID, URL e URL original
-  
-  // Tratamento de erro de carregamento
-  useEffect(() => {
-    // Se houver erro ao carregar a imagem, tentar uma URL alternativa
-    if (imageError) {
-      console.log(`Erro ao carregar imagem ID: ${image.id}, tentando URL alternativa`);
-      
-      try {
-        // Verificar se temos o nome do arquivo nos metadados
-        const fileName = image.metadata?.filename;
-        
-        if (fileName) {
-          // Construir URL alternativa diretamente do storage
-          // Importante: Usar o ID da imagem para manter a URL estável
-          const imageId = image.id;
-          const alternativeUrl = `https://hyhtfzoqjwywzrtdboyq.supabase.co/storage/v1/object/public/user-gallery/${fileName}?id=${imageId}`;
-          
-          console.log(`Tentando URL alternativa para imagem ${image.id}:`, alternativeUrl);
-          setImageUrl(alternativeUrl);
-          
-          // Pré-carregar a imagem alternativa
-          const preloadAltImage = new Image();
-          preloadAltImage.src = alternativeUrl;
-          preloadAltImage.onload = () => console.log(`Imagem alternativa ID: ${image.id} carregada com sucesso`);
-        } else {
-          // Se não temos o nome do arquivo, tentar extrair da URL original
-          const urlParts = image.originalUrl?.split('/') || [];
-          const fileNameFromUrl = urlParts[urlParts.length - 1]?.split('?')[0]; // Remover parâmetros
-          
-          if (fileNameFromUrl) {
-            // Usar o ID da imagem como identificador único e estável
-            const imageId = image.id;
-            const alternativeUrl = `https://hyhtfzoqjwywzrtdboyq.supabase.co/storage/v1/object/public/user-gallery/${fileNameFromUrl}?id=${imageId}`;
-            
-            console.log(`Tentando URL alternativa (do path) para imagem ${image.id}:`, alternativeUrl);
-            setImageUrl(alternativeUrl);
-          }
-        }
-      } catch (e) {
-        console.error(`Erro ao processar URL alternativa da imagem ${image.id}:`, e);
-      }
-    }
-  }, [imageError, image.id, image.originalUrl, image.metadata]);
+  }, [image.id, image.url]);
 
   return (
     <div className="relative group">
@@ -107,7 +56,7 @@ export const ImageCard = ({
             alt="Desenho transformado" 
             className={`w-full h-full object-cover transition-all duration-300 ${isLocked ? 'filter blur-[16px]' : ''}`}
             onError={() => {
-              console.log('Erro ao carregar imagem:', imageUrl);
+              console.log(`Erro ao exibir imagem ID: ${image.id}, URL: ${imageUrl}`);
               setImageError(true);
             }}
           />
@@ -133,7 +82,7 @@ export const ImageCard = ({
         <ImageActions
           imageId={image.id}
           imageUrl={imageUrl}
-          originalUrl={image.metadata?.raw_url || image.originalUrl}
+          originalUrl={image.originalUrl}
           isUnlocked={image.unlocked}
           expired={isExpired}
           isConfirming={isConfirming}
