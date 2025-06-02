@@ -41,10 +41,10 @@ export const useSyncGalleryImages = () => {
 
         console.log(`Encontradas ${storageImages.length} imagens no Storage`);
 
-        // 2. Buscar registros existentes na tabela gallery_images - incluir filename
+        // 2. Buscar registros existentes na tabela gallery_images
         const { data: dbImages, error: dbError } = await supabase
           .from('gallery_images')
-          .select('image_url, filename')
+          .select('image_url, filename, metadata')
           .eq('user_id', user.id)
           .eq('deleted_by_system', false);
 
@@ -60,92 +60,69 @@ export const useSyncGalleryImages = () => {
         );
 
         console.log(`Encontradas ${coloringImages.length} imagens para sincronizar no Storage`);
-        // Log detalhado de todas as imagens encontradas
-        coloringImages.forEach(img => {
-          console.log(`Imagem no storage: ${img.name}, tamanho: ${img.metadata?.size || 'N/A'}`);
-        });
 
-        // Mapear nomes de arquivos já existentes na tabela para evitar duplicação
-        const existingFileNames = new Set();
-        const existingImageUrls = new Set();
+        // Criar um Set com combinações únicas de URL + metadata para evitar duplicação
+        const existingCombinations = new Set();
         
         dbImages?.forEach(img => {
-          // Extrair nome do arquivo da URL ou do campo filename
-          if (img.image_url) {
-            // Armazenar a URL completa para comparação exata
-            existingImageUrls.add(img.image_url);
-            
-            // Extrair e armazenar apenas o nome do arquivo (sem parâmetros)
-            const urlParts = img.image_url.split('/');
-            const fileNameWithParams = urlParts[urlParts.length - 1];
-            const fileName = fileNameWithParams.split('?')[0]; // Remover parâmetros
-            existingFileNames.add(fileName);
-          }
-          
-          // Adicionar também pelo campo filename
-          if (img.filename) {
-            existingFileNames.add(img.filename);
+          if (img.image_url && img.metadata) {
+            // Usar uma combinação de URL + timestamp de criação para identificar entradas únicas
+            const combination = `${img.image_url}_${img.metadata.sync_timestamp || img.metadata.generatedAt}`;
+            existingCombinations.add(combination);
           }
         });
         
-        console.log('Nomes de arquivos existentes:', Array.from(existingFileNames));
-        console.log('URLs de imagens existentes:', Array.from(existingImageUrls));
+        console.log('Combinações existentes:', Array.from(existingCombinations));
 
-        // 4. Para cada imagem de colorir, verificar se já existe na tabela
+        // 4. Para cada imagem de colorir no Storage, criar uma entrada única no banco
         for (const img of coloringImages) {
-          // CORREÇÃO PRINCIPAL: Gerar um filename único para cada imagem
-          // Mesmo que venha com o mesmo nome do N8N, vamos torná-lo único
           const originalFileName = img.name;
+          
+          // Gerar identificadores únicos para esta entrada
           const timestamp = Date.now();
           const randomSuffix = Math.random().toString(36).substring(2, 8);
-          const fileExtension = originalFileName.split('.').pop();
-          const baseFileName = originalFileName.split('.')[0];
+          const uniqueId = `${timestamp}_${randomSuffix}`;
           
-          // Criar um filename único combinando múltiplos fatores
-          const uniqueFileName = `${baseFileName}_${timestamp}_${randomSuffix}.${fileExtension}`;
-          
-          console.log(`Processando: ${originalFileName} -> ${uniqueFileName}`);
-          
-          // Construir URL pública usando o nome original do arquivo no Storage
+          // Construir URL pública usando o nome real do arquivo no Storage
           const imageUrl = supabase.storage.from('user-gallery').getPublicUrl(originalFileName).data.publicUrl;
           
-          // Verificar se já existe pelo nome original OU pela URL
-          const existsByOriginalName = existingFileNames.has(originalFileName);
-          const existsByUrl = existingImageUrls.has(imageUrl);
-          const exists = existsByOriginalName || existsByUrl;
+          // Criar uma combinação única para verificar se já existe
+          const combination = `${imageUrl}_${timestamp}`;
           
-          console.log(`Verificando imagem ${originalFileName}: existsByName=${existsByOriginalName}, existsByUrl=${existsByUrl}`);
-          
-          if (!exists) {
-            console.log(`Sincronizando imagem ${originalFileName} com filename único: ${uniqueFileName}`);
+          // Verificar se esta combinação específica já existe
+          if (!existingCombinations.has(combination)) {
+            console.log(`Criando nova entrada para imagem: ${originalFileName} com ID único: ${uniqueId}`);
             
             try {
-              // Gerar um ID único para a imagem
-              const uniqueId = `${timestamp}_${randomSuffix}`;
+              // Gerar filename único para o banco de dados
+              const fileExtension = originalFileName.split('.').pop();
+              const baseFileName = originalFileName.split('.')[0];
+              const uniqueFileName = `${baseFileName}_${uniqueId}.${fileExtension}`;
               
-              // Inserir a imagem na tabela gallery_images com filename único
+              // Inserir a imagem na tabela gallery_images com dados únicos
               const { data, error } = await supabase
                 .from('gallery_images')
                 .insert([
                   {
                     user_id: user?.id,
                     image_url: imageUrl, // URL baseada no nome original do arquivo no Storage
-                    filename: uniqueFileName, // Nome único gerado para evitar conflitos
+                    filename: uniqueFileName, // Nome único gerado para esta entrada
                     model_version: 'v1',
                     created_at: new Date().toISOString(),
                     unlocked: false,
                     // Definir data de expiração para 7 dias a partir de agora
                     expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                    // Adicionar metadados para ajudar a identificar a imagem
+                    // Metadados únicos para identificar esta entrada específica
                     metadata: {
-                      filename: uniqueFileName, // Nome único gerado
-                      original_filename: originalFileName, // Nome original do Storage
+                      filename: uniqueFileName,
+                      original_filename: originalFileName,
                       raw_url: imageUrl,
                       cache_key: timestamp.toString(),
                       generatedAt: timestamp,
                       uniqueId: uniqueId,
                       sync_timestamp: timestamp,
-                      url: imageUrl
+                      url: imageUrl,
+                      storage_file_name: originalFileName // Nome real no Storage
                     }
                   }
                 ]);
@@ -153,21 +130,21 @@ export const useSyncGalleryImages = () => {
               if (error) {
                 console.error('Erro ao inserir imagem na tabela:', error);
               } else {
-                console.log('Imagem sincronizada com sucesso:', data);
-                // Forçar invalidação do cache para atualizar a galeria
+                console.log('Nova entrada criada com sucesso:', data);
+                existingCombinations.add(combination); // Adicionar à lista para evitar duplicação
                 await queryClient.invalidateQueries({ queryKey: ['userGallery'] });
                 newImagesAdded = true;
               }
             } catch (err) {
-              console.error('Erro ao sincronizar imagem:', err);
+              console.error('Erro ao criar entrada para imagem:', err);
             }
           } else {
-            console.log(`Imagem ${originalFileName} já existe no banco de dados, pulando...`);
+            console.log(`Combinação já existe para: ${originalFileName}, pulando...`);
           }
         }
 
         if (newImagesAdded) {
-          console.log('Nova imagem adicionada, atualizando cache...');
+          console.log('Novas entradas adicionadas, atualizando cache...');
         }
       } catch (error) {
         console.error('Erro durante a sincronização de imagens:', error);
