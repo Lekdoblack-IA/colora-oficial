@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,7 +20,7 @@ export const useSyncGalleryImages = () => {
     const syncImages = async () => {
       try {
         console.log('Iniciando sincronização de imagens do Storage com o banco de dados');
-        let newImagesAdded = false; // Variável para controlar se novas imagens foram adicionadas
+        let newImagesAdded = false;
         
         // 1. Buscar todas as imagens do usuário no Storage
         const { data: storageImages, error: storageError } = await supabase
@@ -93,50 +92,48 @@ export const useSyncGalleryImages = () => {
 
         // 4. Para cada imagem de colorir, verificar se já existe na tabela
         for (const img of coloringImages) {
-          // Construir URL pública correta para a imagem
-          // IMPORTANTE: Armazenar esta URL diretamente no banco para evitar problemas de cache
-          const imageUrl = supabase.storage.from('user-gallery').getPublicUrl(img.name).data.publicUrl;
+          // CORREÇÃO: Usar o nome real do arquivo do Storage ao invés de um nome genérico
+          const realFileName = img.name; // Usar o nome real do arquivo
           
-          // Usar a mesma URL para comparação
-          const publicUrl = imageUrl;
+          // Construir URL pública correta para a imagem usando o nome real
+          const imageUrl = supabase.storage.from('user-gallery').getPublicUrl(realFileName).data.publicUrl;
           
           // Verificar se a imagem já existe na tabela pelo nome do arquivo ou URL
-          const existsByName = existingFileNames.has(img.name);
-          const existsByUrl = existingImageUrls.has(publicUrl);
+          const existsByName = existingFileNames.has(realFileName);
+          const existsByUrl = existingImageUrls.has(imageUrl);
           const exists = existsByName || existsByUrl;
           
-          console.log(`Verificando imagem ${img.name}: existsByName=${existsByName}, existsByUrl=${existsByUrl}`);
+          console.log(`Verificando imagem ${realFileName}: existsByName=${existsByName}, existsByUrl=${existsByUrl}`);
           
           if (!exists) {
-            console.log(`Sincronizando imagem ${img.name} para o banco de dados`);
+            console.log(`Sincronizando imagem ${realFileName} para o banco de dados`);
             
             try {
               // Gerar um ID único para a imagem baseado no timestamp e nome do arquivo
-              // para garantir que cada imagem seja única
-              const uniqueId = `${Date.now()}_${img.name}`;
+              const uniqueId = `${Date.now()}_${realFileName}`;
               
-              // Inserir a imagem na tabela gallery_images
+              // Inserir a imagem na tabela gallery_images usando o nome real do arquivo
               const { data, error } = await supabase
                 .from('gallery_images')
                 .insert([
                   {
                     user_id: user?.id,
-                    image_url: imageUrl, // URL original
-                    filename: img.name, // Nome do arquivo original (campo obrigatório no banco)
-                    model_version: 'v1', // Campo obrigatório no banco
+                    image_url: imageUrl, // URL baseada no nome real do arquivo
+                    filename: realFileName, // Nome real do arquivo do Storage
+                    model_version: 'v1',
                     created_at: new Date().toISOString(),
                     unlocked: false,
                     // Definir data de expiração para 7 dias a partir de agora
                     expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
                     // Adicionar metadados para ajudar a identificar a imagem
                     metadata: {
-                      filename: img.name,
+                      filename: realFileName, // Nome real do arquivo
                       raw_url: imageUrl,
                       cache_key: Date.now().toString(),
                       generatedAt: Date.now(),
                       uniqueId: uniqueId,
                       sync_timestamp: Date.now(),
-                      url: imageUrl // URL com parâmetros anti-cache para exibição (armazenada em metadata)
+                      url: imageUrl
                     }
                   }
                 ]);
@@ -153,7 +150,7 @@ export const useSyncGalleryImages = () => {
               console.error('Erro ao sincronizar imagem:', err);
             }
           } else {
-            console.log(`Imagem ${img.name} já existe no banco de dados, pulando...`);
+            console.log(`Imagem ${realFileName} já existe no banco de dados, pulando...`);
           }
         }
 
