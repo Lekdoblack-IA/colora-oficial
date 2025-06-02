@@ -9,6 +9,7 @@ import { UserImagesGallery } from '@/components/dashboard/UserImagesGallery';
 import { BuyCreditsModal } from '@/components/dashboard/BuyCreditsModal';
 import { useToast } from '@/hooks/use-toast';
 import { useUserGallery } from '@/hooks/useUserGallery';
+import { useSyncGalleryImages } from '@/hooks/useSyncGalleryImages';
 
 const Dashboard = () => {
   const { user, logout, updateCredits } = useAuth();
@@ -16,6 +17,9 @@ const Dashboard = () => {
   const [showBuyCreditsModal, setShowBuyCreditsModal] = useState(false);
   const [selectedImageToUnlock, setSelectedImageToUnlock] = useState<string | null>(null);
   const { toast } = useToast();
+  
+  // Usar o hook de sincronização para garantir que as imagens do Storage apareçam na galeria
+  useSyncGalleryImages();
 
   // Use real gallery data from Supabase
   const {
@@ -42,24 +46,47 @@ const Dashboard = () => {
   const handleImageTransformed = () => {
     console.log('handleImageTransformed chamado - atualizando galeria');
     
+    // Manter o estado de processamento ativo por um tempo mínimo
+    setIsProcessing(true);
+    
     // Immediate refresh
     refetchImages();
     
-    // Additional refreshes to ensure we capture the new image
-    setTimeout(() => {
+    // Configurar uma série de refreshes para garantir que a imagem seja capturada
+    // e manter o indicador de processamento ativo até que a imagem seja realmente exibida
+    
+    // Primeiro refresh após 5 segundos
+    const refresh1 = setTimeout(() => {
       console.log('Refresh adicional 1 executado');
       refetchImages();
     }, 5000);
     
-    setTimeout(() => {
+    // Segundo refresh após 15 segundos
+    const refresh2 = setTimeout(() => {
       console.log('Refresh adicional 2 executado');
       refetchImages();
     }, 15000);
     
-    setTimeout(() => {
+    // Terceiro refresh após 30 segundos
+    const refresh3 = setTimeout(() => {
       console.log('Refresh adicional 3 executado');
       refetchImages();
     }, 30000);
+    
+    // Último refresh após 45 segundos e desativar o estado de processamento
+    const finalRefresh = setTimeout(() => {
+      console.log('Refresh final executado');
+      refetchImages();
+      setIsProcessing(false); // Desativar o estado de processamento apenas quando temos certeza que a imagem foi processada
+    }, 45000);
+    
+    // Limpar os timeouts se o componente for desmontado
+    return () => {
+      clearTimeout(refresh1);
+      clearTimeout(refresh2);
+      clearTimeout(refresh3);
+      clearTimeout(finalRefresh);
+    };
   };
 
   const handleUnlockImage = (imageId: string) => {
@@ -99,7 +126,7 @@ const Dashboard = () => {
   };
 
   const canTransformNewImage = () => {
-    const unlockedImages = userImages.filter(img => !img.isUnlocked && !isImageExpired(img));
+    const unlockedImages = userImages.filter(img => !img.unlocked && !isImageExpired(img));
     return unlockedImages.length < 2;
   };
 

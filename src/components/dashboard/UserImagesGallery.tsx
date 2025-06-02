@@ -3,15 +3,9 @@ import { useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ImageCard } from './gallery/ImageCard';
+import { UserImage } from '@/hooks/useUserGallery';
 
-interface UserImage {
-  id: string;
-  originalUrl: string;
-  transformedUrl: string;
-  isUnlocked: boolean;
-  createdAt: Date;
-  expiresAt?: Date;
-}
+// Interface UserImage importada de @/hooks/useUserGallery
 
 interface UserImagesGalleryProps {
   images: UserImage[];

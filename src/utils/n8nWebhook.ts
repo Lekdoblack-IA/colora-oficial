@@ -17,6 +17,15 @@ export const sendImageToN8N = async ({
     
     const formData = new FormData();
     
+    // Gerar um nome de arquivo único baseado no timestamp e nome original
+    const timestamp = Date.now();
+    const uniqueId = Math.random().toString(36).substring(2, 8); // Gera um ID aleatório
+    const originalName = fileName || imageFile.name;
+    const fileExt = originalName.split('.').pop() || 'png';
+    const uniqueFileName = `image_${timestamp}_${uniqueId}.${fileExt}`;
+    
+    console.log('Nome de arquivo único gerado:', uniqueFileName);
+    
     // Campo obrigatório: imagem como arquivo binário
     formData.append('image', imageFile);
     
@@ -25,13 +34,16 @@ export const sendImageToN8N = async ({
       formData.append('user_id', userId);
     }
     
-    if (fileName) {
-      formData.append('file_name', fileName);
-    }
+    // Sempre usar o nome de arquivo único
+    formData.append('file_name', uniqueFileName);
     
     if (createdAt) {
       formData.append('created_at', createdAt);
     }
+    
+    // Adicionar metadados adicionais para rastreabilidade
+    formData.append('original_file_name', originalName);
+    formData.append('generated_at', timestamp.toString());
 
     console.log('Enviando imagem para N8N:', {
       originalFileName: imageFile.name,

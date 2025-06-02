@@ -92,23 +92,29 @@ export const useImageTransform = (
     setIsProcessing(true);
     setCurrentMessageIndex(0);
 
-    // Start the message progression with slower timing for longer processing
+    // Gerar um ID único para esta transformação para rastreamento
+    const transformId = `transform_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+    console.log(`ID de transformação: ${transformId}`);
+
+    // Progresso das mensagens mais lento para dar tempo do processamento real
     const messageInterval = setInterval(() => {
       setCurrentMessageIndex(prev => {
         const nextIndex = prev + 1;
-        console.log('Progresso da mensagem:', nextIndex, '/', processingMessages.length);
+        console.log(`[${transformId}] Progresso da mensagem:`, nextIndex, '/', processingMessages.length);
+        
+        // Manter a última mensagem por mais tempo
         if (nextIndex >= processingMessages.length - 1) {
-          clearInterval(messageInterval);
+          // Não limpar o intervalo, apenas manter a última mensagem
           return processingMessages.length - 1;
         }
         return nextIndex;
       });
-    }, 3000); // Increased from 2000 to 3000ms for longer total time
+    }, 4000); // Aumentado para 4 segundos para dar mais tempo ao processamento real
 
     try {
-      console.log('Enviando imagem para N8N...');
+      console.log(`[${transformId}] Enviando imagem para N8N...`);
       
-      // Send image to N8N for processing
+      // Enviar imagem para processamento no N8N
       const webhookSuccess = await sendImageToN8N({
         imageFile: selectedImage,
         userId: user.id,
@@ -116,39 +122,62 @@ export const useImageTransform = (
         createdAt: new Date().toISOString()
       });
 
-      console.log('Resultado do webhook N8N:', webhookSuccess);
+      console.log(`[${transformId}] Resultado do webhook N8N:`, webhookSuccess);
 
       if (webhookSuccess) {
-        // Wait longer for processing - let the messages complete plus additional time
-        const totalProcessingTime = processingMessages.length * 3000; // 39 seconds total
-        const additionalWaitTime = 20000; // Additional 20 seconds for N8N processing
-        const totalWaitTime = Math.max(totalProcessingTime, additionalWaitTime);
+        // Tempo mínimo de processamento para mostrar as mensagens
+        const minProcessingTime = processingMessages.length * 4000; // ~52 segundos
         
-        console.log(`Aguardando processamento completo por ${totalWaitTime}ms`);
+        // Tempo adicional para garantir que a imagem seja processada pelo N8N
+        const additionalWaitTime = 30000; // 30 segundos adicionais
         
+        // Tempo total de espera (mínimo 60 segundos)
+        const totalWaitTime = Math.max(minProcessingTime, additionalWaitTime, 60000);
+        
+        console.log(`[${transformId}] Aguardando processamento completo por ${totalWaitTime/1000} segundos`);
+        
+        // Primeiro timeout - após o tempo mínimo, verificar se a imagem já está disponível
         setTimeout(() => {
-          console.log('Finalizando processamento com sucesso');
-          clearInterval(messageInterval);
-          setIsProcessing(false);
-          handleCancel();
+          console.log(`[${transformId}] Finalizando fase inicial de processamento`);
           
+          // Não finalizar o processamento ainda, apenas notificar o usuário
           toast({
-            title: "Imagem processada com sucesso!",
-            description: "Sua imagem foi transformada e aparecerá na galeria em instantes.",
+            title: "Processamento em andamento",
+            description: "Sua imagem está sendo finalizada e aparecerá na galeria em instantes.",
           });
           
-          // Call the callback to refresh the gallery
+          // Chamar o callback para atualizar a galeria e verificar se a imagem já está disponível
           onImageTransformed();
           
-          // Also trigger a delayed refresh to ensure we get the new image
-          setTimeout(() => {
-            console.log('Executando refresh adicional da galeria');
+          // Continuar verificando a cada 10 segundos até um tempo máximo
+          let checkCount = 0;
+          const maxChecks = 6; // Máximo de 6 verificações adicionais (60 segundos)
+          
+          const checkInterval = setInterval(() => {
+            checkCount++;
+            console.log(`[${transformId}] Verificando disponibilidade da imagem: tentativa ${checkCount}/${maxChecks}`);
+            
+            // Atualizar a galeria novamente
             onImageTransformed();
-          }, 5000);
+            
+            // Se atingimos o número máximo de verificações, finalizar o processamento
+            if (checkCount >= maxChecks) {
+              console.log(`[${transformId}] Tempo máximo de verificação atingido, finalizando processamento`);
+              clearInterval(checkInterval);
+              clearInterval(messageInterval);
+              setIsProcessing(false);
+              handleCancel();
+              
+              toast({
+                title: "Processamento concluído",
+                description: "Sua imagem foi processada e deve estar disponível na galeria.",
+              });
+            }
+          }, 10000); // Verificar a cada 10 segundos
           
         }, totalWaitTime);
       } else {
-        console.error('Falha no envio para N8N');
+        console.error(`[${transformId}] Falha no envio para N8N`);
         clearInterval(messageInterval);
         setIsProcessing(false);
         
@@ -159,7 +188,7 @@ export const useImageTransform = (
         });
       }
     } catch (error) {
-      console.error('Erro no processamento da imagem:', error);
+      console.error(`[${transformId}] Erro no processamento da imagem:`, error);
       clearInterval(messageInterval);
       setIsProcessing(false);
       
