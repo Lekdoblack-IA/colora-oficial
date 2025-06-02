@@ -46,8 +46,6 @@ export const useUserGallery = () => {
   const queryClient = useQueryClient();
   
   // Gerar um timestamp único para esta sessão
-  // Este timestamp é gerado apenas uma vez quando o hook é montado
-  // e não muda entre renderizações
   const sessionTimestamp = useRef(Date.now()).current;
 
   // Fetch user's gallery images with more frequent refetching
@@ -63,10 +61,6 @@ export const useUserGallery = () => {
 
       console.log('Buscando imagens do usuário:', user.id);
 
-      // Pular a verificação do storage para evitar chamadas desnecessárias
-      // que podem causar carregamento infinito
-
-      // Agora buscamos as imagens do banco de dados
       const { data, error } = await supabase
         .from('gallery_images')
         .select('*')
@@ -82,74 +76,87 @@ export const useUserGallery = () => {
       console.log('Imagens encontradas no banco:', data?.length || 0);
       
       if (data) {
-        // Log detalhado das imagens encontradas
         data.forEach(img => {
-          console.log(`Imagem ID: ${img.id}, URL: ${img.image_url}, Unlocked: ${img.unlocked}`);
+          console.log(`Imagem ID: ${img.id}, URL: ${img.image_url}, Filename: ${img.filename}, Unlocked: ${img.unlocked}`);
         });
       }
 
-      // Map Supabase data to UserImage interface com validação extra
+      // Map Supabase data to UserImage interface com correção de URL
       return (data || []).map((img: GalleryImage): UserImage => {
-        // IMPORTANTE: Usar diretamente a URL da imagem do banco de dados
-        // Isso garante que cada imagem tenha sua própria URL única
-        let imageUrl = img.image_url;
+        let finalImageUrl = '';
+        let originalImageUrl = '';
         
-        // Verificar se a URL existe e é válida
-        if (!imageUrl || !imageUrl.startsWith('http')) {
-          console.error(`URL inválida para imagem ${img.id}: ${imageUrl}`);
-          // Fallback: construir URL a partir do filename apenas se necessário
-          if (img.filename) {
-            imageUrl = supabase.storage.from('user-gallery').getPublicUrl(img.filename).data.publicUrl;
-            console.log(`URL construída a partir do filename para imagem ${img.id}: ${imageUrl}`);
-          }
+        // CORREÇÃO: Verificar se image_url já é uma URL válida e não duplicada
+        if (img.image_url && img.image_url.startsWith('http') && !img.image_url.includes('http://') && !img.image_url.includes('https://https://')) {
+          // URL já é válida e não está duplicada
+          finalImageUrl = img.image_url;
+          originalImageUrl = img.image_url;
+          console.log(`Usando URL direta válida para imagem ${img.id}: ${finalImageUrl}`);
         } else {
-          console.log(`Usando URL direta do banco para imagem ${img.id}: ${imageUrl}`);
+          // URL inválida ou duplicada, construir a partir do filename
+          if (img.filename) {
+            const { data: urlData } = supabase.storage.from('user-gallery').getPublicUrl(img.filename);
+            finalImageUrl = urlData.publicUrl;
+            originalImageUrl = urlData.publicUrl;
+            console.log(`URL construída a partir do filename para imagem ${img.id}: ${finalImageUrl}`);
+          } else {
+            // Último recurso: tentar extrair filename da URL corrompida
+            let extractedFilename = '';
+            if (img.image_url) {
+              // Procurar por padrões como "coloring_" ou "image_" na URL
+              const matches = img.image_url.match(/(coloring_\d+\.png|image_\d+_\w+\.\w+)/g);
+              if (matches && matches.length > 0) {
+                extractedFilename = matches[matches.length - 1]; // Pegar o último match (mais específico)
+              }
+            }
+            
+            if (extractedFilename) {
+              const { data: urlData } = supabase.storage.from('user-gallery').getPublicUrl(extractedFilename);
+              finalImageUrl = urlData.publicUrl;
+              originalImageUrl = urlData.publicUrl;
+              console.log(`URL construída a partir de filename extraído para imagem ${img.id}: ${finalImageUrl}`);
+            } else {
+              console.error(`Não foi possível construir URL para imagem ${img.id}`);
+              // Usar uma URL de fallback para evitar quebrar a aplicação
+              finalImageUrl = '';
+              originalImageUrl = '';
+            }
+          }
         }
         
-        // Usar a URL diretamente do banco como URL raw
-        const rawUrl = imageUrl;
+        // Pular imagens sem URL válida
+        if (!finalImageUrl) {
+          console.warn(`Pulando imagem ${img.id} sem URL válida`);
+          return null;
+        }
         
-        // SOLUÇÃO RADICAL: Gerar uma URL completamente única para cada imagem
-        // e forçar o navegador a não usar o cache
+        // Criar URL única para cache-busting usando o ID da imagem
+        const uniqueCacheKey = `${img.id}_${sessionTimestamp}`;
+        const displayUrl = `${finalImageUrl}?v=${uniqueCacheKey}`;
         
-        // Extrair a URL base sem parâmetros
-        const baseUrl = rawUrl.split('?')[0];
-        
-        // Usar o timestamp da sessão definido no início do hook
-        // Isso garante que o timestamp seja o mesmo para todas as imagens durante a sessão
-        // mas diferente a cada vez que o usuário recarrega a página
-        
-        // Combinar ID da imagem e timestamp da sessão para criar uma URL única
-        // que não mudará durante a sessão do usuário
-        const uniqueId = `${img.id}_${sessionTimestamp}`;
-        
-        // Construir uma URL completamente nova com o ID único
-        // Isso garante que cada imagem tenha uma URL única e que o navegador não use o cache
-        const persistentUrl = `${baseUrl}?v=${uniqueId}`;
-        
-        console.log(`URL persistente para imagem ID: ${img.id}: ${persistentUrl}`);
-        console.log(`Processando imagem ID: ${img.id}, URL persistente: ${persistentUrl}`);
+        console.log(`URL final para imagem ID: ${img.id}: ${displayUrl}`);
         
         return {
           id: img.id,
-          originalUrl: imageUrl, // URL original sem parâmetros de cache para download
-          url: persistentUrl, // URL persistente que não muda entre renderizações
+          originalUrl: finalImageUrl, // URL original limpa para download
+          url: displayUrl, // URL com cache-busting para exibição
           createdAt: img.created_at,
           unlocked: img.unlocked === true,
           name: img.filename || `imagem-${img.id}`,
           expiresAt: img.expires_at ? new Date(img.expires_at) : undefined,
           metadata: {
             filename: img.filename,
-            raw_url: imageUrl, // URL original sem parâmetros de cache
-            image_id: img.id // Usar o ID da imagem como identificador estável
+            raw_url: finalImageUrl,
+            image_id: img.id,
+            cache_key: uniqueCacheKey
           }
         };
-      });
+      }).filter(Boolean) as UserImage[]; // Remover itens null
     },
     enabled: !!user?.id,
-    refetchInterval: 5000, // Refetch every 5 seconds (mais frequente)
-    staleTime: 1000, // Data is considered stale after 1 second (mais rápido)
-    retry: 3, // Tentar 3 vezes em caso de erro
+    refetchInterval: 5000,
+    staleTime: 1000,
+    retry: 3,
   });
 
   // Unlock image mutation
