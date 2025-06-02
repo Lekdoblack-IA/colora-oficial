@@ -9,6 +9,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { PackageSelector } from './PackageSelector';
 import { PackageCard } from './PackageCard';
 import { SecurityNotice } from './SecurityNotice';
+import { PixPaymentModal } from './PixPaymentModal';
 import { X } from 'lucide-react';
 
 interface BuyCreditsModalProps {
@@ -59,6 +60,8 @@ export const BuyCreditsModal = ({
 }: BuyCreditsModalProps) => {
   const [selectedPackage, setSelectedPackage] = useState('plus');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [showPixModal, setShowPixModal] = useState(false);
+  const [pixData, setPixData] = useState<{ pixUrl: string; pixBase64: string } | null>(null);
   const isMobile = useIsMobile();
   const { user } = useAuth();
 
@@ -71,7 +74,7 @@ export const BuyCreditsModal = ({
     
     // Send webhook with user data
     try {
-      await fetch('https://n8n.srv845529.hstgr.cloud/webhook-test/d8e707ae-093a-4e08-9069-8627eb9c1d19', {
+      const response = await fetch('https://n8n.srv845529.hstgr.cloud/webhook-test/d8e707ae-093a-4e08-9069-8627eb9c1d19', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,16 +87,44 @@ export const BuyCreditsModal = ({
           planName: selectedPkg.name
         })
       });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Webhook response:', data);
+        
+        // Check if response contains PIX data
+        if (data.pix_url && data.pix_base64) {
+          setPixData({
+            pixUrl: data.pix_url,
+            pixBase64: data.pix_base64
+          });
+          setShowPixModal(true);
+        } else {
+          // Fallback to old behavior if no PIX data
+          setTimeout(() => {
+            onCreditsAdded(selectedPkg.credits);
+            setIsProcessingPayment(false);
+          }, 2000);
+        }
+      } else {
+        throw new Error('Payment request failed');
+      }
     } catch (error) {
       console.error('Error sending webhook:', error);
       // Continue with purchase even if webhook fails
+      setTimeout(() => {
+        onCreditsAdded(selectedPkg.credits);
+        setIsProcessingPayment(false);
+      }, 2000);
     }
     
-    // Simular processamento de pagamento
-    setTimeout(() => {
-      onCreditsAdded(selectedPkg.credits);
-      setIsProcessingPayment(false);
-    }, 2000);
+    setIsProcessingPayment(false);
+  };
+
+  const handlePixModalClose = () => {
+    setShowPixModal(false);
+    setPixData(null);
+    onClose(); // Close the main modal as well
   };
 
   const DesktopModalHeader = () => (
@@ -247,27 +278,49 @@ export const BuyCreditsModal = ({
 
   if (isMobile) {
     return (
-      <Drawer open={isOpen} onOpenChange={onClose}>
-        <DrawerContent className="h-[85vh] border-0 p-0 rounded-t-3xl">
-          <DialogTitle className="sr-only">Comprar Créditos</DialogTitle>
-          <DialogDescription className="sr-only">
-            Modal para escolher e comprar pacotes de créditos para desbloquear imagens
-          </DialogDescription>
-          <MobileModalContent />
-        </DrawerContent>
-      </Drawer>
+      <>
+        <Drawer open={isOpen} onOpenChange={onClose}>
+          <DrawerContent className="h-[85vh] border-0 p-0 rounded-t-3xl">
+            <DialogTitle className="sr-only">Comprar Créditos</DialogTitle>
+            <DialogDescription className="sr-only">
+              Modal para escolher e comprar pacotes de créditos para desbloquear imagens
+            </DialogDescription>
+            <MobileModalContent />
+          </DrawerContent>
+        </Drawer>
+
+        {pixData && (
+          <PixPaymentModal
+            isOpen={showPixModal}
+            onClose={handlePixModalClose}
+            pixUrl={pixData.pixUrl}
+            pixBase64={pixData.pixBase64}
+          />
+        )}
+      </>
     );
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg border-0 p-0 bg-transparent shadow-none">
-        <DialogTitle className="sr-only">Comprar Créditos</DialogTitle>
-        <DialogDescription className="sr-only">
-          Modal para escolher e comprar pacotes de créditos para desbloquear imagens
-        </DialogDescription>
-        <DesktopModalContent />
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-lg border-0 p-0 bg-transparent shadow-none">
+          <DialogTitle className="sr-only">Comprar Créditos</DialogTitle>
+          <DialogDescription className="sr-only">
+            Modal para escolher e comprar pacotes de créditos para desbloquear imagens
+          </DialogDescription>
+          <DesktopModalContent />
+        </DialogContent>
+      </Dialog>
+
+      {pixData && (
+        <PixPaymentModal
+          isOpen={showPixModal}
+          onClose={handlePixModalClose}
+          pixUrl={pixData.pixUrl}
+          pixBase64={pixData.pixBase64}
+        />
+      )}
+    </>
   );
 };
