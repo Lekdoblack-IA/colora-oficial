@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
@@ -59,13 +60,34 @@ export const BuyCreditsModal = ({
   const [selectedPackage, setSelectedPackage] = useState('plus');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const isMobile = useIsMobile();
+  const { user } = useAuth();
 
   const selectedPkg = packages.find(pkg => pkg.id === selectedPackage);
 
   const handlePurchase = async () => {
-    if (!selectedPkg) return;
+    if (!selectedPkg || !user) return;
 
     setIsProcessingPayment(true);
+    
+    // Send webhook with user data
+    try {
+      await fetch('https://n8n.srv845529.hstgr.cloud/webhook-test/d8e707ae-093a-4e08-9069-8627eb9c1d19', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          email: user.email,
+          name: user.name,
+          planValue: selectedPkg.totalPrice,
+          planName: selectedPkg.name
+        })
+      });
+    } catch (error) {
+      console.error('Error sending webhook:', error);
+      // Continue with purchase even if webhook fails
+    }
     
     // Simular processamento de pagamento
     setTimeout(() => {
