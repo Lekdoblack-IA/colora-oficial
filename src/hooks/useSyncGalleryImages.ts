@@ -44,7 +44,7 @@ export const useSyncGalleryImages = () => {
         // 2. Buscar registros existentes na tabela gallery_images
         const { data: dbImages, error: dbError } = await supabase
           .from('gallery_images')
-          .select('image_url, filename, metadata')
+          .select('image_url, filename, created_at')
           .eq('user_id', user.id)
           .eq('deleted_by_system', false);
 
@@ -61,18 +61,16 @@ export const useSyncGalleryImages = () => {
 
         console.log(`Encontradas ${coloringImages.length} imagens para sincronizar no Storage`);
 
-        // Criar um Set com combinações únicas de URL + metadata para evitar duplicação
-        const existingCombinations = new Set();
+        // Criar um Set com filenames únicos já existentes
+        const existingFilenames = new Set();
         
         dbImages?.forEach(img => {
-          if (img.image_url && img.metadata) {
-            // Usar uma combinação de URL + timestamp de criação para identificar entradas únicas
-            const combination = `${img.image_url}_${img.metadata.sync_timestamp || img.metadata.generatedAt}`;
-            existingCombinations.add(combination);
+          if (img.filename) {
+            existingFilenames.add(img.filename);
           }
         });
         
-        console.log('Combinações existentes:', Array.from(existingCombinations));
+        console.log('Filenames existentes:', Array.from(existingFilenames));
 
         // 4. Para cada imagem de colorir no Storage, criar uma entrada única no banco
         for (const img of coloringImages) {
@@ -86,19 +84,16 @@ export const useSyncGalleryImages = () => {
           // Construir URL pública usando o nome real do arquivo no Storage
           const imageUrl = supabase.storage.from('user-gallery').getPublicUrl(originalFileName).data.publicUrl;
           
-          // Criar uma combinação única para verificar se já existe
-          const combination = `${imageUrl}_${timestamp}`;
+          // Gerar filename único para o banco de dados
+          const fileExtension = originalFileName.split('.').pop();
+          const baseFileName = originalFileName.split('.')[0];
+          const uniqueFileName = `${baseFileName}_${uniqueId}.${fileExtension}`;
           
-          // Verificar se esta combinação específica já existe
-          if (!existingCombinations.has(combination)) {
-            console.log(`Criando nova entrada para imagem: ${originalFileName} com ID único: ${uniqueId}`);
+          // Verificar se este filename único já existe
+          if (!existingFilenames.has(uniqueFileName)) {
+            console.log(`Criando nova entrada para imagem: ${originalFileName} com filename único: ${uniqueFileName}`);
             
             try {
-              // Gerar filename único para o banco de dados
-              const fileExtension = originalFileName.split('.').pop();
-              const baseFileName = originalFileName.split('.')[0];
-              const uniqueFileName = `${baseFileName}_${uniqueId}.${fileExtension}`;
-              
               // Inserir a imagem na tabela gallery_images com dados únicos
               const { data, error } = await supabase
                 .from('gallery_images')
@@ -111,19 +106,7 @@ export const useSyncGalleryImages = () => {
                     created_at: new Date().toISOString(),
                     unlocked: false,
                     // Definir data de expiração para 7 dias a partir de agora
-                    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                    // Metadados únicos para identificar esta entrada específica
-                    metadata: {
-                      filename: uniqueFileName,
-                      original_filename: originalFileName,
-                      raw_url: imageUrl,
-                      cache_key: timestamp.toString(),
-                      generatedAt: timestamp,
-                      uniqueId: uniqueId,
-                      sync_timestamp: timestamp,
-                      url: imageUrl,
-                      storage_file_name: originalFileName // Nome real no Storage
-                    }
+                    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
                   }
                 ]);
 
@@ -131,7 +114,7 @@ export const useSyncGalleryImages = () => {
                 console.error('Erro ao inserir imagem na tabela:', error);
               } else {
                 console.log('Nova entrada criada com sucesso:', data);
-                existingCombinations.add(combination); // Adicionar à lista para evitar duplicação
+                existingFilenames.add(uniqueFileName); // Adicionar à lista para evitar duplicação
                 await queryClient.invalidateQueries({ queryKey: ['userGallery'] });
                 newImagesAdded = true;
               }
@@ -139,7 +122,7 @@ export const useSyncGalleryImages = () => {
               console.error('Erro ao criar entrada para imagem:', err);
             }
           } else {
-            console.log(`Combinação já existe para: ${originalFileName}, pulando...`);
+            console.log(`Filename já existe: ${uniqueFileName}, pulando...`);
           }
         }
 
