@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,10 +41,10 @@ export const useSyncGalleryImages = () => {
 
         console.log(`Encontradas ${storageImages.length} imagens no Storage`);
 
-        // 2. Buscar registros existentes na tabela gallery_images
+        // 2. Buscar registros existentes na tabela gallery_images - CORRIGIDO: incluir filename
         const { data: dbImages, error: dbError } = await supabase
           .from('gallery_images')
-          .select('image_url')
+          .select('image_url, filename')
           .eq('user_id', user.id)
           .eq('deleted_by_system', false);
 
@@ -144,8 +145,8 @@ export const useSyncGalleryImages = () => {
                 console.error('Erro ao inserir imagem na tabela:', error);
               } else {
                 console.log('Imagem sincronizada com sucesso:', data);
-                // Forçar invalidação do cache para atualizar a galeria
-                await queryClient.invalidateQueries(['userGallery']);
+                // Forçar invalidação do cache para atualizar a galeria - CORRIGIDO: usar objeto
+                await queryClient.invalidateQueries({ queryKey: ['userGallery'] });
                 newImagesAdded = true;
               }
             } catch (err) {
