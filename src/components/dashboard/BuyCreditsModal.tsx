@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -10,6 +9,9 @@ import { PackageSelector } from './PackageSelector';
 import { PackageCard } from './PackageCard';
 import { SecurityNotice } from './SecurityNotice';
 import { PixPaymentModal } from './PixPaymentModal';
+import { usePlans } from '@/hooks/usePlans';
+import { usePurchases } from '@/hooks/usePurchases';
+import { useToast } from '@/hooks/use-toast';
 import { X } from 'lucide-react';
 
 interface BuyCreditsModalProps {
@@ -19,61 +21,64 @@ interface BuyCreditsModalProps {
   currentCredits: number;
 }
 
-const packages = [
-  {
-    id: 'mini',
-    name: 'Mini',
-    credits: 1,
-    pricePerCredit: 5,
-    totalPrice: 5,
-    description: 'Perfeito para transformar sua arte em um cartão inesquecível ou um presente de moldura.',
-    note: 'Economize 20% comprando pacote "Plus"',
-    isPopular: false
-  },
-  {
-    id: 'plus',
-    name: 'Plus',
-    credits: 12,
-    pricePerCredit: 4,
-    totalPrice: 48,
-    description: 'Ideal para criar uma sequência de memórias — como uma linha do tempo ou mural de fotos',
-    note: 'Economize 40% comprando pacote "Max"',
-    isPopular: true
-  },
-  {
-    id: 'max',
-    name: 'Max',
-    credits: 24,
-    pricePerCredit: 3,
-    totalPrice: 72,
-    description: 'A escolha perfeita para montar um álbum completo, livro personalizado ou caixa de memórias',
-    note: 'Melhor custo benefício!',
-    isPopular: false
-  }
-];
-
 export const BuyCreditsModal = ({ 
   isOpen, 
   onClose, 
   onCreditsAdded, 
   currentCredits 
 }: BuyCreditsModalProps) => {
-  const [selectedPackage, setSelectedPackage] = useState('plus');
+  const [selectedPackageId, setSelectedPackageId] = useState<string>('');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showPixModal, setShowPixModal] = useState(false);
   const [pixData, setPixData] = useState<{ pixUrl: string; pixBase64: string } | null>(null);
   const isMobile = useIsMobile();
   const { user } = useAuth();
+  const { toast } = useToast();
 
-  const selectedPkg = packages.find(pkg => pkg.id === selectedPackage);
+  // Buscar planos do Supabase
+  const { data: plans = [], isLoading: isLoadingPlans, error: plansError } = usePlans();
+  const { createPurchase, isCreatingPurchase } = usePurchases();
+
+  // Selecionar o plano "Plus" por padrão quando os planos carregarem
+  if (plans.length > 0 && !selectedPackageId) {
+    const plusPlan = plans.find(plan => plan.name.toLowerCase() === 'plus') || plans[1] || plans[0];
+    setSelectedPackageId(plusPlan.id);
+  }
+
+  const selectedPlan = plans.find(plan => plan.id === selectedPackageId);
+
+  // Mapear planos para o formato esperado pelos componentes existentes
+  const mappedPackages = plans.map(plan => ({
+    id: plan.id,
+    name: plan.name,
+    credits: plan.credits,
+    pricePerCredit: Math.round(plan.price_cents / plan.credits / 100),
+    totalPrice: plan.price_brl,
+    description: plan.description || '',
+    note: plan.name === 'Plus' ? 'Economize 40% comprando pacote "Max"' : 
+          plan.name === 'Mini' ? 'Economize 20% comprando pacote "Plus"' : 
+          'Melhor custo benefício!',
+    isPopular: plan.name.toLowerCase() === 'plus'
+  }));
 
   const handlePurchase = async () => {
-    if (!selectedPkg || !user) return;
+    if (!selectedPlan || !user) return;
 
     setIsProcessingPayment(true);
     
-    // Send webhook with user data
     try {
+      // Criar registro de compra no Supabase
+      const externalReference = `${user.id}_${Date.now()}`;
+      
+      createPurchase({
+        plan_id: selectedPlan.id,
+        amount_cents: selectedPlan.price_cents,
+        credits_purchased: selectedPlan.credits,
+        external_reference: externalReference,
+        payment_method: 'pix'
+      });
+
+      // Enviar webhook com dados da compra para N8n
       const response = await fetch('https://n8n.srv845529.hstgr.cloud/webhook-test/d8e707ae-093a-4e08-9069-8627eb9c1d19', {
         method: 'POST',
         headers: {
@@ -83,8 +88,11 @@ export const BuyCreditsModal = ({
           userId: user.id,
           email: user.email,
           name: user.name,
-          planValue: selectedPkg.totalPrice,
-          planName: selectedPkg.name
+          planValue: selectedPlan.price_brl,
+          planName: selectedPlan.name,
+          planId: selectedPlan.id,
+          credits: selectedPlan.credits,
+          externalReference: externalReference
         })
       });
 
@@ -100,22 +108,23 @@ export const BuyCreditsModal = ({
           });
           setShowPixModal(true);
         } else {
-          // Fallback to old behavior if no PIX data
-          setTimeout(() => {
-            onCreditsAdded(selectedPkg.credits);
-            setIsProcessingPayment(false);
-          }, 2000);
+          // Fallback para desenvolvimento
+          toast({
+            title: "Compra processada!",
+            description: "Sua compra foi registrada e está sendo processada.",
+          });
+          onClose();
         }
       } else {
         throw new Error('Payment request failed');
       }
     } catch (error) {
-      console.error('Error sending webhook:', error);
-      // Continue with purchase even if webhook fails
-      setTimeout(() => {
-        onCreditsAdded(selectedPkg.credits);
-        setIsProcessingPayment(false);
-      }, 2000);
+      console.error('Erro ao processar compra:', error);
+      toast({
+        title: "Erro no pagamento",
+        description: "Não foi possível processar sua compra. Tente novamente.",
+        variant: "destructive"
+      });
     }
     
     setIsProcessingPayment(false);
@@ -124,8 +133,38 @@ export const BuyCreditsModal = ({
   const handlePixModalClose = () => {
     setShowPixModal(false);
     setPixData(null);
-    onClose(); // Close the main modal as well
+    onClose();
   };
+
+  // Loading state
+  if (isLoadingPlans) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-lg">
+          <div className="flex items-center justify-center p-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-4"></div>
+              <p>Carregando planos...</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Error state
+  if (plansError || plans.length === 0) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-lg">
+          <div className="text-center p-8">
+            <p className="text-red-600 mb-4">Erro ao carregar planos disponíveis</p>
+            <Button onClick={onClose}>Fechar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   const DesktopModalHeader = () => (
     <>
@@ -181,18 +220,18 @@ export const BuyCreditsModal = ({
         </div>
 
         <PackageSelector 
-          packages={packages}
-          selectedPackage={selectedPackage}
-          onPackageChange={setSelectedPackage}
+          packages={mappedPackages}
+          selectedPackage={selectedPackageId}
+          onPackageChange={setSelectedPackageId}
         />
 
-        {selectedPkg && <PackageCard selectedPackage={selectedPkg} />}
+        {selectedPlan && <PackageCard selectedPackage={mappedPackages.find(p => p.id === selectedPackageId)!} />}
 
-        {/* Savings note - moved outside the border */}
-        {selectedPkg?.note && (
+        {/* Savings note */}
+        {selectedPlan && (
           <div className="text-center mb-4">
             <p className="text-sm text-green-600 font-medium">
-              {selectedPkg.note}
+              {mappedPackages.find(p => p.id === selectedPackageId)?.note}
             </p>
           </div>
         )}
@@ -200,12 +239,12 @@ export const BuyCreditsModal = ({
         {/* CTA Button */}
         <Button 
           onClick={handlePurchase}
-          disabled={isProcessingPayment}
+          disabled={isProcessingPayment || isCreatingPurchase}
           className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-full h-14 font-semibold text-lg mb-4"
         >
-          {isProcessingPayment 
+          {isProcessingPayment || isCreatingPurchase
             ? 'Processando...' 
-            : `Comprar ${selectedPkg?.credits} ${selectedPkg?.credits === 1 ? 'Crédito' : 'Créditos'} >`
+            : `Comprar ${selectedPlan?.credits} ${selectedPlan?.credits === 1 ? 'Crédito' : 'Créditos'} >`
           }
         </Button>
 
@@ -216,7 +255,7 @@ export const BuyCreditsModal = ({
 
   const MobileModalContent = () => (
     <div className="bg-white h-full flex flex-col overflow-hidden">
-      {/* Fixed Header - Now completely black */}
+      {/* Fixed Header */}
       <div className="flex-shrink-0">
         <MobileModalHeader />
       </div>
@@ -232,23 +271,23 @@ export const BuyCreditsModal = ({
 
           <div className="mb-6">
             <PackageSelector 
-              packages={packages}
-              selectedPackage={selectedPackage}
-              onPackageChange={setSelectedPackage}
+              packages={mappedPackages}
+              selectedPackage={selectedPackageId}
+              onPackageChange={setSelectedPackageId}
             />
           </div>
 
-          {selectedPkg && (
+          {selectedPlan && (
             <div className="mb-4">
-              <PackageCard selectedPackage={selectedPkg} />
+              <PackageCard selectedPackage={mappedPackages.find(p => p.id === selectedPackageId)!} />
             </div>
           )}
 
-          {/* Savings note - moved outside the border */}
-          {selectedPkg?.note && (
+          {/* Savings note */}
+          {selectedPlan && (
             <div className="text-center mb-6">
               <p className="text-sm text-green-600 font-medium">
-                {selectedPkg.note}
+                {mappedPackages.find(p => p.id === selectedPackageId)?.note}
               </p>
             </div>
           )}
@@ -264,12 +303,12 @@ export const BuyCreditsModal = ({
       <div className="flex-shrink-0 p-6 bg-white border-t border-gray-100">
         <Button 
           onClick={handlePurchase}
-          disabled={isProcessingPayment}
+          disabled={isProcessingPayment || isCreatingPurchase}
           className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-full h-14 font-semibold text-lg"
         >
-          {isProcessingPayment 
+          {isProcessingPayment || isCreatingPurchase
             ? 'Processando...' 
-            : `Comprar ${selectedPkg?.credits} ${selectedPkg?.credits === 1 ? 'Crédito' : 'Créditos'} >`
+            : `Comprar ${selectedPlan?.credits} ${selectedPlan?.credits === 1 ? 'Crédito' : 'Créditos'} >`
           }
         </Button>
       </div>

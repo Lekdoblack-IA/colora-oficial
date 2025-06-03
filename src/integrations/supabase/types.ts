@@ -151,42 +151,45 @@ export type Database = {
       }
       purchases: {
         Row: {
-          amount_paid_brl: number
-          amount_paid_cents: number
+          amount_cents: number
+          created_at: string
           credits_purchased: number
+          external_reference: string | null
           id: string
+          mercado_pago_payment_id: string | null
           payment_method: string | null
-          payment_reference: string | null
-          payment_status: string
           plan_id: string
           processed_at: string | null
-          purchased_at: string
+          status: string
+          updated_at: string
           user_id: string
         }
         Insert: {
-          amount_paid_brl: number
-          amount_paid_cents: number
+          amount_cents: number
+          created_at?: string
           credits_purchased: number
+          external_reference?: string | null
           id?: string
+          mercado_pago_payment_id?: string | null
           payment_method?: string | null
-          payment_reference?: string | null
-          payment_status?: string
           plan_id: string
           processed_at?: string | null
-          purchased_at?: string
+          status?: string
+          updated_at?: string
           user_id: string
         }
         Update: {
-          amount_paid_brl?: number
-          amount_paid_cents?: number
+          amount_cents?: number
+          created_at?: string
           credits_purchased?: number
+          external_reference?: string | null
           id?: string
+          mercado_pago_payment_id?: string | null
           payment_method?: string | null
-          payment_reference?: string | null
-          payment_status?: string
           plan_id?: string
           processed_at?: string | null
-          purchased_at?: string
+          status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
